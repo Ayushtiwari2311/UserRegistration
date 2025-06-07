@@ -1,0 +1,109 @@
+﻿@{
+    ViewData["Title"] = "User Registration";
+}
+
+<div class="container mt-4">
+    <h2>User Registration</h2>
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <input id="searchName" class="form-control" placeholder="Search by name" />
+        </div>
+        <div class="col-md-3">
+            <select id="filterState" class="form-select"></select>
+        </div>
+        <div class="col-md-3">
+            <select id="filterCity" class="form-select"></select>
+        </div>
+        <div class="col-md-3">
+            <button id="searchBtn" class="btn btn-primary w-100">Search</button>
+        </div>
+    </div>
+    <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#userModal">Register User</button>
+    <table id="userTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>DOB</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>State</th>
+                <th>City</th>
+                <th>Hobbies</th>
+                <th>Photo</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <form id="userForm" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Register User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label>Name</label>
+                        <input name="Name" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Gender</label>
+                        <select name="Gender" class="form-select" required></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>DOB</label>
+                        <input type="date" name="DateOfBirth" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Email</label>
+                        <input type="email" name="Email" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Mobile</label>
+                        <input type="text" name="Mobile" class="form-control" pattern="[0-9]{10}" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Contact No</label>
+                        <input name="ContactNo" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>State</label>
+                        <select name="State" class="form-select" required>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>City</label>
+                        <select name="City" class="form-select" required>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Hobbies</label>
+                        <div id="hobbyList"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Photo</label>
+                        <input type="file" name="Photo" class="form-control" accept="image/*" required />
+                    </div>
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="termsCheckbox">
+                        <label class="form-check-label" for="termsCheckbox">
+                            I agree to the <a href="#">Terms and Conditions</a>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/AppJs/userregistration.js"></script>
