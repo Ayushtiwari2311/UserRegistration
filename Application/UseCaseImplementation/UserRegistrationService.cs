@@ -10,8 +10,8 @@ namespace Application.UseCaseImplementation
         public async Task<ResponseDTO> AddAsync(SaveUserResgistrationDTO dto, FileUploadDto photoDto)
         {
             var response = new ResponseDTO();
-            try
-            {
+            //try
+            //{
                 if (!await repository.CheckUserExistsByEmail(dto.Email))
                 {
                     if (photoDto != null)
@@ -54,12 +54,12 @@ namespace Application.UseCaseImplementation
                 {
                     response.Message = $"User already exists with {dto.Email}!";
                 }
-            }
-            catch(Exception e)
-            {   
-                response.IsSuccess = false;
-                response.Message = "Oops! Error occured please try again!";
-            }
+            //}
+            //catch(Exception e)
+            //{   
+            //    response.IsSuccess = false;
+            //    response.Message = "Oops! Error occured please try again!";
+            //}
             return response;
         }
 

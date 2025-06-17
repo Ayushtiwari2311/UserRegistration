@@ -1,8 +1,11 @@
+using API.Middlewares;
 using Application.DependencyInjection;
 using Domain.DTOs;
 using Infrastructure.DependencyInjection;
+using Infrastructure.SeriLog;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -46,6 +49,15 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .MinimumLevel.Error() // Only log errors and above
+        .WriteTo.Console()
+        .WriteTo.Sink(new EFSerilogSink(services));
+});
+
+
 
 var app = builder.Build();
 
@@ -59,6 +71,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors(MyAllowSpecificOrigins);
+app.UseMiddleware<ErrorLoggingMiddleware>();
 
 app.UseAuthorization();
 

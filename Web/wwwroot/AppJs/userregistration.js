@@ -63,7 +63,6 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function (data) {
-                console.log(data);
                 if (data.isSuccess) {
                     $('#userModal').modal('hide');
                     Swal.fire({
@@ -154,7 +153,7 @@ function loadDropdowns() {
         $('#hobbyList').html(h.map(o =>
             `<div class="form-check">
                     <input type="checkbox" name="HobbyIds" class="form-check-input" value="${o.id}"/> ${o.name}
-                </div>`
+            </div>`
         ));
     });
 }
