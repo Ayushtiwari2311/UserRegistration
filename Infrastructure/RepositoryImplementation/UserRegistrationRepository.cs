@@ -68,12 +68,13 @@ namespace Infrastructure.RepositoryImplementation
         public async Task<ResponseDTO<TrnUserRegistration>> GetUserDetails(string email)
         {
             var user = context.TrnUserRegistrations
-                .Include(u => u.State)
+                        .Include(u => u.Gender)
+                        .Include(u => u.State)
                         .Include(u => u.City)
                         .Include(u => u.UserHobbies)
                             .ThenInclude(uh => uh.Hobby)
                        .FirstOrDefault(u => u.Email == email);
-            if (user is TrnUserRegistration)
+            if (user is not null)
             {
                 return ResponseDTO<TrnUserRegistration>.Ok(user);
             }

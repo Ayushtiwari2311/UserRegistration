@@ -31,8 +31,6 @@ namespace Domain.DTOs
         {
             Data = data;
         }
-        public bool IsSuccess { get; set; }
-        public string Message { get; set; }
         public T? Data { get; set; }
 
         public static ResponseDTO<T> Ok(T data, string? message = null)

@@ -13,7 +13,6 @@ namespace Domain.RepositoryInterfaces
         Task<DTODataTablesResponse<TrnUserRegistration>> GetAllAsync(GetUserRegistrationListDTO dto);
         Task AddAsync(TrnUserRegistration userRegistration);
         Task<bool> CheckUserExistsByEmail(string email);
-
         Task<ResponseDTO<TrnUserRegistration>> GetUserDetails(string email);
     }
 }

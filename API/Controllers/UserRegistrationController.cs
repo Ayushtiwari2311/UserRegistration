@@ -17,6 +17,13 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{email}")]
+        public async Task<IActionResult> Get([FromRoute] string email)
+        {
+            var result = await service.GetUserDetails(email);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] AddUserRegistrationDTO dto)
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.DTOs;
+using Domain.Entities;
 
 namespace Application.UseCaseInterfaces
 {
@@ -11,5 +12,6 @@ namespace Application.UseCaseInterfaces
     {
         Task<DTODataTablesResponse<GetUserRegistrationDTO>> GetAllAsync(GetUserRegistrationListDTO dto);
         Task<ResponseDTO> AddAsync(SaveUserResgistrationDTO dto, FileUploadDto photoDto);
+        Task<ResponseDTO<GetUserRegistrationDTO>> GetUserDetails(string email);
     }
 }
