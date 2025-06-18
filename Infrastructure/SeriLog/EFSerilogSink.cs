@@ -27,27 +27,15 @@ namespace Infrastructure.SeriLog
             if (logEvent.Level < LogEventLevel.Error)
                 return;
 
+            // Only process if it has our custom property
+            if (!logEvent.Properties.TryGetValue("SourceContext", out var sourceProp) ||
+                sourceProp.ToString() != "\"API.Handler.ExceptionHandler\"") 
+                return;
+                
+
             var exception = logEvent.Exception;
 
-            var method = exception?.TargetSite;
-
             string? exceptionMessage = exception?.InnerException?.Message ?? exception?.Message;
-            string? className = null;
-            string? methodName = null;
-
-            if (exception != null)
-            {
-                var st = new StackTrace(exception, true);
-                var frames = st.GetFrames().Select(f=> f.GetMethod()?.DeclaringType?.Namespace);
-                var frame = st.GetFrames()?.FirstOrDefault(f =>
-                    f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("API") == true);
-
-                if (frame != null)
-                {
-                    className = frame.GetMethod()?.DeclaringType?.FullName;
-                    methodName = frame.GetMethod()?.Name;
-                }
-            }
 
             using var scope = _serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<LoggingDbContext>();
@@ -57,9 +45,7 @@ namespace Infrastructure.SeriLog
                 Timestamp = logEvent.Timestamp.UtcDateTime,
                 Level = logEvent.Level.ToString(),
                 Message = logEvent.RenderMessage(),
-                Exception = exceptionMessage,
-                SourceClass = className,
-                SourceMethod = methodName
+                Exception = exceptionMessage
             };
 
             db.Exceptions.Add(log);

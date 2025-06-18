@@ -1,4 +1,4 @@
-using API.Middlewares;
+using API.Handler;
 using Application.DependencyInjection;
 using Domain.DTOs;
 using Infrastructure.DependencyInjection;
@@ -18,6 +18,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationService();
 builder.Services.AddInfrastructureService(builder.Configuration);
+
+builder.Services.AddExceptionHandler<ExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 
 builder.Services.AddCors(options =>
@@ -67,7 +70,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors(MyAllowSpecificOrigins);
-app.UseMiddleware<ErrorLoggingMiddleware>();
+//app.UseMiddleware<ErrorLoggingMiddleware>();
+app.UseExceptionHandler();
 
 app.UseAuthorization();
 

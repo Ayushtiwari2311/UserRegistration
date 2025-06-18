@@ -13,8 +13,5 @@ namespace Domain.Entities
         public string Level { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public string? Exception { get; set; }
-
-        public string? SourceClass { get; set; }
-        public string? SourceMethod { get; set; }
     }
 }

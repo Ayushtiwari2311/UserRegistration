@@ -41,7 +41,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("MCities");
+                    b.ToTable("MCities", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MGender", b =>
@@ -58,7 +58,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MGenders");
+                    b.ToTable("MGenders", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MHobby", b =>
@@ -75,7 +75,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MHobbies");
+                    b.ToTable("MHobbies", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MState", b =>
@@ -92,7 +92,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MStates");
+                    b.ToTable("MStates", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.TrnUserHobby", b =>
@@ -107,7 +107,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("HobbyId");
 
-                    b.ToTable("MUserHobbies");
+                    b.ToTable("MUserHobbies", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.TrnUserRegistration", b =>
@@ -159,7 +159,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("TrnUserRegistrations");
+                    b.ToTable("TrnUserRegistrations", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.MCity", b =>
