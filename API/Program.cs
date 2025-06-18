@@ -41,11 +41,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
         var htmlList = $"<ul style='text-align: left; margin-left: 1.5em;'>{string.Join("", errors)}</ul>";
 
-        return new OkObjectResult(new ResponseDTO()
-        {
-            IsSuccess = false,
-            Message = htmlList
-        });
+        return new OkObjectResult(ResponseDTO.Fail(htmlList));
     };
 });
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -11,6 +12,7 @@ using Domain.RepositoryInterfaces;
 using Infrastructure.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using static Azure.Core.HttpHeader;
 
 namespace Infrastructure.RepositoryImplementation
 {
@@ -24,9 +26,10 @@ namespace Infrastructure.RepositoryImplementation
 
         public async Task<bool> CheckUserExistsByEmail(string email) => context.TrnUserRegistrations.Any(u => u.Email == email);
 
-        public async Task<DTODataTablesResponse<GetUserRegistrationDTO>> GetAllAsync(GetUserRegistrationListDTO dto)
+        public async Task<DTODataTablesResponse<TrnUserRegistration>> GetAllAsync(GetUserRegistrationListDTO dto)
         {
             var query = context.TrnUserRegistrations
+                        .Include(u => u.Gender)
                         .Include(u => u.State)
                         .Include(u => u.City)
                         .Include(u => u.UserHobbies)
@@ -51,21 +54,9 @@ namespace Infrastructure.RepositoryImplementation
                         .OrderBy(u => u.Name)
                         .Skip(dto.Start * dto.Length)
                         .Take(dto.Length)
-                        .Select(u => new GetUserRegistrationDTO() {
-                            Name = u.Name,
-                            Gender = u.Gender.Name,
-                            DateOfBirth = u.DateOfBirth,
-                            Email = u.Email,
-                            Mobile = u.Mobile,
-                            ContactNo = u.ContactNo,
-                            State = u.State.Name,
-                            City = u.City.Name,
-                            Hobbies = u.UserHobbies.Select(h => h.Hobby.Name).ToList(),
-                            PhotoPath = u.PhotoPath
-                        })
                         .ToListAsync();
 
-            return new DTODataTablesResponse<GetUserRegistrationDTO>()
+            return new DTODataTablesResponse<TrnUserRegistration>()
             {
                 draw = dto.Draw,
                 recordsTotal = totalCount,
@@ -74,5 +65,22 @@ namespace Infrastructure.RepositoryImplementation
             };
         }
 
+        public async Task<ResponseDTO<TrnUserRegistration>> GetUserDetails(string email)
+        {
+            var user = context.TrnUserRegistrations
+                .Include(u => u.State)
+                        .Include(u => u.City)
+                        .Include(u => u.UserHobbies)
+                            .ThenInclude(uh => uh.Hobby)
+                       .FirstOrDefault(u => u.Email == email);
+            if (user is TrnUserRegistration)
+            {
+                return ResponseDTO<TrnUserRegistration>.Ok(user);
+            }
+            else
+            {
+                return ResponseDTO<TrnUserRegistration>.Fail("No Record Found!");
+            }
+        }
     }
 }

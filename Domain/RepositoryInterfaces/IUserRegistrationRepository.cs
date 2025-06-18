@@ -10,8 +10,10 @@ namespace Domain.RepositoryInterfaces
 {
     public interface IUserRegistrationRepository
     {
-        Task<DTODataTablesResponse<GetUserRegistrationDTO>> GetAllAsync(GetUserRegistrationListDTO dto);
+        Task<DTODataTablesResponse<TrnUserRegistration>> GetAllAsync(GetUserRegistrationListDTO dto);
         Task AddAsync(TrnUserRegistration userRegistration);
         Task<bool> CheckUserExistsByEmail(string email);
+
+        Task<ResponseDTO<TrnUserRegistration>> GetUserDetails(string email);
     }
 }

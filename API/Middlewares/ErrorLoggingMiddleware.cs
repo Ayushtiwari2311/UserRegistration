@@ -19,12 +19,11 @@ namespace API.Middlewares
             {
                 await _next(context);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                ResponseDTO response = new ResponseDTO() { Message = "oops! something went wrong please try again!" };
-                //_logger.LogError(ex, "Unhandled exception occurred");
+                _logger.LogError(ex, "Unhandled exception occurred");
                 context.Response.StatusCode = 200;
-                await context.Response.WriteAsJsonAsync(response);
+                await context.Response.WriteAsJsonAsync(ResponseDTO.Fail("oops! something went wrong please try again!"));
             }
         }
     }
