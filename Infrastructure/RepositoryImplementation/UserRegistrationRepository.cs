@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Azure.Core;
-using Domain.DTOs;
+﻿using DataTransferObjects.Request.User;
+using DataTransferObjects.Response.Common;
 using Domain.Entities;
 using Domain.RepositoryInterfaces;
 using Infrastructure.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using static Azure.Core.HttpHeader;
 
 namespace Infrastructure.RepositoryImplementation
 {
-    public class UserRegistrationRepository(AppDbContext context) : IUserRegistrationRepository
+    internal class UserRegistrationRepository(AppDbContext context) : IUserRegistrationRepository
     {
         public async Task AddAsync(TrnUserRegistration userRegistration)
         {
@@ -26,7 +17,7 @@ namespace Infrastructure.RepositoryImplementation
 
         public async Task<bool> CheckUserExistsByEmail(string email) => context.TrnUserRegistrations.Any(u => u.Email == email);
 
-        public async Task<DTODataTablesResponse<TrnUserRegistration>> GetAllAsync(GetUserRegistrationListDTO dto)
+        public async Task<DataTableResponseDTO<TrnUserRegistration>> GetAllAsync(GetUserRequestListDTO dto)
         {
             var query = context.TrnUserRegistrations
                         .Include(u => u.Gender)
@@ -56,7 +47,7 @@ namespace Infrastructure.RepositoryImplementation
                         .Take(dto.Length)
                         .ToListAsync();
 
-            return new DTODataTablesResponse<TrnUserRegistration>()
+            return new DataTableResponseDTO<TrnUserRegistration>()
             {
                 draw = dto.Draw,
                 recordsTotal = totalCount,
@@ -65,7 +56,7 @@ namespace Infrastructure.RepositoryImplementation
             };
         }
 
-        public async Task<ResponseDTO<TrnUserRegistration>> GetUserDetails(string email)
+        public async Task<APIResponseDTO<TrnUserRegistration>> GetUserDetails(string email)
         {
             var user = context.TrnUserRegistrations
                         .Include(u => u.Gender)
@@ -76,11 +67,11 @@ namespace Infrastructure.RepositoryImplementation
                        .FirstOrDefault(u => u.Email == email);
             if (user is not null)
             {
-                return ResponseDTO<TrnUserRegistration>.Ok(user);
+                return APIResponseDTO<TrnUserRegistration>.Ok(user);
             }
             else
             {
-                return ResponseDTO<TrnUserRegistration>.Fail("No Record Found!");
+                return APIResponseDTO<TrnUserRegistration>.Fail("No Record Found!");
             }
         }
     }

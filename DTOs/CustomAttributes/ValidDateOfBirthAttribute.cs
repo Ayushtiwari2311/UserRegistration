@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.CustomAttributes
 {
-    public class ValidDateOfBirthAttribute : ValidationAttribute
+    internal class ValidDateOfBirthAttribute : ValidationAttribute
     {
         public ValidDateOfBirthAttribute()
         {

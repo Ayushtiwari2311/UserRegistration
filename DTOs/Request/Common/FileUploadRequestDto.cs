@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DTOs
+namespace DataTransferObjects.Request.Common
 {
-    public class FileUploadDto
+    public class FileUploadRequestDto
     {
         public string FileName { get; set; }
         public string ContentType { get; set; }

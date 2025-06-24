@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.DTOs;
+﻿using DataTransferObjects.Response.Common;
 
 namespace Application.UseCaseInterfaces
 {
     public interface IMastersService
     {
-        Task<IEnumerable<DTODropDown>> GetGendersAsync();
-        Task<IEnumerable<DTODropDown>> GetHobbiesAsync();
-        Task<IEnumerable<DTODropDown>> GetStatesAsync();
-        Task<IEnumerable<DTODropDown>> GetCitiesAsync(int stateId);
+        Task<IEnumerable<DropDownResponseDTO>> GetGendersAsync();
+        Task<IEnumerable<DropDownResponseDTO>> GetHobbiesAsync();
+        Task<IEnumerable<DropDownResponseDTO>> GetStatesAsync();
+        Task<IEnumerable<DropDownResponseDTO>> GetCitiesAsync(int stateId);
     }
 }

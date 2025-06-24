@@ -1,6 +1,7 @@
+using API.DependencyInjection;
 using API.Handler;
 using Application.DependencyInjection;
-using Domain.DTOs;
+using DataTransferObjects.Response.Common;
 using Infrastructure.DependencyInjection;
 using Infrastructure.SeriLog;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -16,6 +17,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAPIService();
 builder.Services.AddApplicationService();
 builder.Services.AddInfrastructureService(builder.Configuration);
 
@@ -44,7 +46,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
         var htmlList = $"<ul style='text-align: left; margin-left: 1.5em;'>{string.Join("", errors)}</ul>";
 
-        return new OkObjectResult(ResponseDTO.Fail(htmlList));
+        return new OkObjectResult(APIResponseDTO.Fail(htmlList));
     };
 });
 

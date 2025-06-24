@@ -1,6 +1,9 @@
 ﻿using Application.UseCaseInterfaces;
 using AutoMapper;
-using Domain.DTOs;
+using DataTransferObjects.Request.Common;
+using DataTransferObjects.Request.User;
+using DataTransferObjects.Response.Common;
+using DataTransferObjects.Response.User;
 using Domain.Entities;
 using Domain.RepositoryInterfaces;
 
@@ -8,9 +11,9 @@ namespace Application.UseCaseImplementation
 {
     public class UserRegistrationService(IUserRegistrationRepository repository, IMapper mapper) : IUserRegistrationService
     { 
-        public async Task<ResponseDTO> AddAsync(SaveUserResgistrationDTO dto, FileUploadDto photoDto)
+        public async Task<APIResponseDTO> AddAsync(SaveUserResgistrationDTO dto, FileUploadRequestDto photoDto)
         {
-            var response = ResponseDTO.Ok();
+            var response = APIResponseDTO.Ok();
             if (!await repository.CheckUserExistsByEmail(dto.Email))
             {  
                 if (photoDto != null)
@@ -30,37 +33,37 @@ namespace Application.UseCaseImplementation
                 }
                 var user =  mapper.Map<TrnUserRegistration>(dto);
                 await repository.AddAsync(user);
-                response = ResponseDTO.Ok("User registered!");
+                response = APIResponseDTO.Ok("User registered!");
             }
             else
             {
-                response = ResponseDTO.Fail($"User already exists with {dto.Email}!");
+                response = APIResponseDTO.Fail($"User already exists with {dto.Email}!");
             }
             return response;
         }
 
-        public async Task<DTODataTablesResponse<GetUserRegistrationDTO>> GetAllAsync(GetUserRegistrationListDTO dto)
+        public async Task<DataTableResponseDTO<GetUserResponseDTO>> GetAllAsync(GetUserRequestListDTO dto)
         {
             var usersRepData = await repository.GetAllAsync(dto);
-            return new DTODataTablesResponse<GetUserRegistrationDTO>
+            return new DataTableResponseDTO<GetUserResponseDTO>
             {
                 draw = dto.Draw,
                 recordsTotal = usersRepData.recordsTotal,
                 recordsFiltered = usersRepData.recordsFiltered,
-                data = mapper.Map<List<GetUserRegistrationDTO>>(usersRepData.data)
+                data = mapper.Map<List<GetUserResponseDTO>>(usersRepData.data)
             };
         }
 
-        public async Task<ResponseDTO<GetUserRegistrationDTO>> GetUserDetails(string email)
+        public async Task<APIResponseDTO<GetUserResponseDTO>> GetUserDetails(string email)
         {
             var response = await repository.GetUserDetails(email);
             if (response.IsSuccess)
             {
-                return ResponseDTO<GetUserRegistrationDTO>.Ok(mapper.Map<GetUserRegistrationDTO>(response.Data));
+                return APIResponseDTO<GetUserResponseDTO>.Ok(mapper.Map<GetUserResponseDTO>(response.Data));
             }
             else
             {
-               return ResponseDTO<GetUserRegistrationDTO>.Fail(response.Message);
+               return APIResponseDTO<GetUserResponseDTO>.Fail(response.Message);
             }
         }
     }

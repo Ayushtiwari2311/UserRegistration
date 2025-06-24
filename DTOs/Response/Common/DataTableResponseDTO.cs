@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DTOs
+namespace DataTransferObjects.Response.Common
 {
-    public class DTODataTablesResponse<T>
+    public class DataTableResponseDTO<T>
     {
         public int draw { get; set; }
         public int recordsTotal { get; set; }

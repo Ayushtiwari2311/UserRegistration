@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.DTOs;
+﻿using DataTransferObjects.Request.User;
+using DataTransferObjects.Response.Common;
 using Domain.Entities;
 
 namespace Domain.RepositoryInterfaces
 {
     public interface IUserRegistrationRepository
     {
-        Task<DTODataTablesResponse<TrnUserRegistration>> GetAllAsync(GetUserRegistrationListDTO dto);
+        Task<DataTableResponseDTO<TrnUserRegistration>> GetAllAsync(GetUserRequestListDTO dto);
         Task AddAsync(TrnUserRegistration userRegistration);
         Task<bool> CheckUserExistsByEmail(string email);
-        Task<ResponseDTO<TrnUserRegistration>> GetUserDetails(string email);
+        Task<APIResponseDTO<TrnUserRegistration>> GetUserDetails(string email);
     }
 }

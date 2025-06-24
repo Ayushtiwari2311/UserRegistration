@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.RepositoryImplementation
 {
-    public class MastersRepository(AppDbContext context) : IMastersRepository
+    internal class MastersRepository(AppDbContext context) : IMastersRepository
     {
         public async Task<IEnumerable<MGender>> GetGendersAsync() => await context.MGenders.AsNoTracking().ToListAsync();
         public async Task<IEnumerable<MHobby>> GetHobbiesAsync() => await context.MHobbies.AsNoTracking().ToListAsync();

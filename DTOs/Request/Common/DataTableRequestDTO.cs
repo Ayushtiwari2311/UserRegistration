@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DTOs
+namespace DataTransferObjects.Request.Common
 {
-    public class DTODataTablesRequest
+    public class DataTableRequestDTO
     {
         [RegularExpression("^[0-9]+$", ErrorMessage = "Numbers allowed.")]
         public int Draw { get; set; }

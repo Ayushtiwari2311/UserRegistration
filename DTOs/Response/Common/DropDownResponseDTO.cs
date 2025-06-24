@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DTOs
+namespace DataTransferObjects.Response.Common
 {
-    public class DTODropDown
+    public class DropDownResponseDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

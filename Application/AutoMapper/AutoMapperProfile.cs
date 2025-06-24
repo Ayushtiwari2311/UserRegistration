@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Domain.DTOs;
+using DataTransferObjects.Request.User;
+using DataTransferObjects.Response.User;
 using Domain.Entities;
 
 namespace Application.AutoMapper
@@ -7,7 +8,7 @@ namespace Application.AutoMapper
     public class AutoMapperProfile : Profile
     {
         public AutoMapperProfile() {
-            CreateMap<TrnUserRegistration, GetUserRegistrationDTO>()
+            CreateMap<TrnUserRegistration, GetUserResponseDTO>()
             .ForMember(user => user.Gender, opt => opt.MapFrom(src => src.Gender.Name))
             .ForMember(user => user.State, opt => opt.MapFrom(src => src.State.Name))
             .ForMember(user => user.City, opt => opt.MapFrom(src => src.City.Name))

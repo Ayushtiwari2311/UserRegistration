@@ -1,5 +1,5 @@
 ﻿using API.CustomAttributes;
-using Domain.DTOs;
+using DataTransferObjects.Request.User;
 
 namespace API.DTOs
 {

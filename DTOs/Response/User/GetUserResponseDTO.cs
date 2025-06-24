@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.DTOs
+namespace DataTransferObjects.Response.User
 {
-    public class GetUserRegistrationDTO
+    public class GetUserResponseDTO
     {
         public string Name { get; set; }
         public string Gender { get; set; }

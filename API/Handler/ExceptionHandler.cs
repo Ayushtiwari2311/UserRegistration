@@ -1,7 +1,5 @@
-﻿using Domain.DTOs;
+﻿using DataTransferObjects.Response.Common;
 using Microsoft.AspNetCore.Diagnostics;
-using System.Diagnostics;
-
 namespace API.Handler
 {
     internal sealed class ExceptionHandler(ILogger<ExceptionHandler> logger) : IExceptionHandler
@@ -10,7 +8,7 @@ namespace API.Handler
         {
             logger.LogError(exception, "Unhandled exception occurred in {Method} {Path}",httpContext.Request.Method,httpContext.Request.Path);
             httpContext.Response.StatusCode = StatusCodes.Status200OK;
-            await httpContext.Response.WriteAsJsonAsync(ResponseDTO.Fail("oops! something went wrong please try again!"),cancellationToken);
+            await httpContext.Response.WriteAsJsonAsync(APIResponseDTO.Fail("oops! something went wrong please try again!"),cancellationToken);
             return true;
         }
     }

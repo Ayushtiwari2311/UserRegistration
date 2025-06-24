@@ -1,6 +1,7 @@
 ﻿using API.DTOs;
 using Application.UseCaseInterfaces;
-using Domain.DTOs;
+using DataTransferObjects.Request.Common;
+using DataTransferObjects.Request.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,7 @@ namespace API.Controllers
     public class UserRegistrationController(IUserRegistrationService service) : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] GetUserRegistrationListDTO dto)
+        public async Task<IActionResult> GetAll([FromQuery] GetUserRequestListDTO dto)
         { 
             var result = await service.GetAllAsync(dto);
             return Ok(result);
@@ -27,13 +28,13 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] AddUserRegistrationDTO dto)
         {
-            FileUploadDto photoDto = null;
+            FileUploadRequestDto photoDto = null;
             if (dto.Photo != null && dto.Photo.Length > 0)
             {
                 using var ms = new MemoryStream();
                 await dto.Photo.CopyToAsync(ms);
-                photoDto = new FileUploadDto
-                {
+                photoDto = new FileUploadRequestDto
+				{
                     FileName = dto.Photo.FileName,
                     ContentType = dto.Photo.ContentType,
                     FileData = ms.ToArray()

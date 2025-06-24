@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.CustomAttributes;
 
-namespace Domain.DTOs
+namespace DataTransferObjects.Request.User
 {
     public class SaveUserResgistrationDTO
     {
