@@ -1,3 +1,4 @@
+using API.Configurations;
 using API.DependencyInjection;
 using API.Handler;
 using Application.DependencyInjection;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Add services to the container.
 
@@ -20,35 +20,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAPIService();
 builder.Services.AddApplicationService();
 builder.Services.AddInfrastructureService(builder.Configuration);
-
+builder.Services.AddCustomModelValidationResponse(builder.Environment);
+builder.Services.AddRateLimiterPolicy(builder.Environment);
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddHttpContextAccessor();
 
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-        policy =>
-        {
-            policy.WithOrigins("https://localhost:7059")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.InvalidModelStateResponseFactory = context =>
-    {
-        var errors = context.ModelState
-            .Where(x => x.Value?.Errors.Count > 0)
-            .SelectMany(kvp => kvp.Value!.Errors.Select(e => $"<li><strong>{kvp.Key}</strong>: {e.ErrorMessage}</li>"));
-
-        var htmlList = $"<ul style='text-align: left; margin-left: 1.5em;'>{string.Join("", errors)}</ul>";
-
-        return new OkObjectResult(APIResponseDTO.Fail(htmlList));
-    };
-});
+builder.Services.AddCorsPolicy(builder.Environment);
 
 builder.Host.UseSerilog((context, services, configuration) =>
 {
@@ -71,8 +49,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseCors(MyAllowSpecificOrigins);
-//app.UseMiddleware<ErrorLoggingMiddleware>();
+app.UseCors(CorsConfig.GetPolicyName());
+app.UseRateLimiter();
 app.UseExceptionHandler();
 
 app.UseAuthorization();
