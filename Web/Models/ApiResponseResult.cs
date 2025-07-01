@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Web.Models
+namespace MVC.Models
 {
     public class ApiResponseResult<T>
     {

@@ -1,6 +1,6 @@
 ﻿using DataTransferObjects.Response.Common;
 using Microsoft.AspNetCore.Diagnostics;
-namespace API.Handler
+namespace Presentation.Handler
 {
     internal sealed class ExceptionHandler(ILogger<ExceptionHandler> logger) : IExceptionHandler
     {

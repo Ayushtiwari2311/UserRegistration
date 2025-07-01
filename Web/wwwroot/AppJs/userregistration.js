@@ -68,7 +68,7 @@ $(document).ready(function () {
         });
 
         $.ajax({
-            url: `${hostUrl}/api/UserRegistration`,
+            url: `${hostUrl}/UserRegistration`,
             type: 'POST',
             data: formData,
             contentType: false,
@@ -117,7 +117,7 @@ function initializeDataTable() {
                 cityId: $('#filterCity').val()
             };
 
-            $.get(`${hostUrl}/api/UserRegistration`, params, function (res) {
+            $.get(`${hostUrl}/UserRegistration`, params, function (res) {
                 callback({
                     recordsTotal: res.recordsTotal,
                     recordsFiltered: res.recordsFiltered,

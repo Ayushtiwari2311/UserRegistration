@@ -1,4 +1,4 @@
-﻿namespace API.Helpers
+﻿namespace Presentation.Helpers
 {
     public class Constants
     {

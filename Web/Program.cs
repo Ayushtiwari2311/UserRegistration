@@ -1,7 +1,8 @@
 using Microsoft.Extensions.Options;
 using System.Net;
-using Web.DependencyInjection;
-using Web.Models;
+using MVC.DependencyInjection;
+using MVC.Models;
+using MVC.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
+builder.Services.AddTransient<AuthHeaderHandler>();
 
 builder.Services.AddHttpClient("ApiClient", (serviceProvider, client) =>
 {
@@ -16,13 +18,16 @@ builder.Services.AddHttpClient("ApiClient", (serviceProvider, client) =>
     //client.BaseAddress = new Uri(settings.BaseUrl);
     client.BaseAddress = new Uri("https://localhost:7155/api");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
+}).AddHttpMessageHandler<AuthHeaderHandler>();
 //.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 //{
 //    AllowAutoRedirect = true,
 //    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 //    UseCookies = true
 //});
+
+builder.Services.AddHttpContextAccessor();
+
 
 builder.Services.AddWebService();
 
@@ -41,6 +46,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseMiddleware<AuthValidationMiddleware>();
 
 app.UseAuthorization();
 

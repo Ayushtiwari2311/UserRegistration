@@ -1,13 +1,15 @@
-﻿using API.DTOs;
+﻿using Presentation.DTOs;
 using Application.UseCaseInterfaces;
 using DataTransferObjects.Request.Common;
 using DataTransferObjects.Request.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
-namespace API.Controllers
+namespace Presentation.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("[controller]")]
     [ApiController]
     public class UserRegistrationController(IUserRegistrationService service) : ControllerBase
     {
@@ -25,6 +27,10 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Add user
+        /// </summary>
+        /// <returns>Response</returns>
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] AddUserRegistrationDTO dto)
         {

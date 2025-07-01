@@ -1,10 +1,12 @@
-﻿using API.Helpers;
+﻿using Presentation.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
-namespace API.Controllers
+namespace Presentation.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("[controller]")]
     [ApiController]
     public class ImageController : ControllerBase
     {

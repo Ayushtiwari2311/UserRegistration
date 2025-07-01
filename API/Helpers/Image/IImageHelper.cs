@@ -1,4 +1,4 @@
-﻿namespace API.Helpers.Image
+﻿namespace Presentation.Helpers.Image
 {
 	public interface IImageHelper
 	{

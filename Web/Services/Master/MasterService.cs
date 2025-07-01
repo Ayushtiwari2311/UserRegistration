@@ -1,28 +1,23 @@
 ﻿using DataTransferObjects.Response.Common;
 using System.Net.Http;
-using Web.Helper;
+using MVC.Helper;
 
-namespace Web.Services.Master
+namespace MVC.Services.Master
 {
     public class MasterService : IMasterService
     {
         private readonly HttpClient _httpClient;
-        public MasterService(IHttpClientFactory httpClientFactory)
+        private readonly IHttpContextAccessor _contextAccessor;
+        public MasterService(IHttpClientFactory httpClientFactory, IHttpContextAccessor contextAccessor)
         {
             _httpClient = httpClientFactory.CreateClient("ApiClient");
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<APIResponseDTO<List<DropDownResponseDTO>>> GetAllDropDown(string dDName,int parentId) {
             var response = await _httpClient.GetAsync($"/Masters/{dDName}{(parentId > 0 ? $"/{parentId}" : "")}");
-            var apiResponse = await response.ReadApiResponseAsync<List<DropDownResponseDTO>>();
-            if (apiResponse.Success)
-            {
-                return APIResponseDTO<List<DropDownResponseDTO>>.Ok(apiResponse.Data);
-            }
-            else
-            {
-                return APIResponseDTO<List<DropDownResponseDTO>>.Fail(apiResponse.ErrorMessage);
-            }
+            var apiResponse = await response.ReadApiResponseAsync<List<DropDownResponseDTO>>(_contextAccessor.HttpContext);
+            return apiResponse;
         }
 
     }

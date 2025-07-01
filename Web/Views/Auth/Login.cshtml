@@ -1,0 +1,52 @@
+﻿@model LoginUserRequestModel
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $("#loginForm").submit(function (e) {
+            e.preventDefault();
+
+            var data = {
+                Email: $("#Email").val(),
+                Password: $("#Password").val()
+            };
+
+            $.ajax({
+                url: "/auth/login",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if (response.isSuccess) {
+                        // Set cookie from server-side
+                        window.location.href = "/User";
+                    } else {
+                        Swal.fire({
+                            title: "Error",
+                            html: response.message || "Login failed",
+                            icon: "error"
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        title: "Error",
+                        html: "Login failed. Server error.",
+                        icon: "error"
+                    });
+                }
+            });
+        });
+    </script>
+}
+<form id="loginForm" class="mt-4 w-50 mx-auto">
+    <h3>Login</h3>
+    <div class="form-group">
+        <label>Email</label>
+        <input id="Email" name="Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input id="Password" name="Password" type="password" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Login</button>
+</form>

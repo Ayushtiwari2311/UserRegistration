@@ -13,6 +13,7 @@ namespace Application.DependencyInjection
             services.AddAutoMapper(typeof(AutoMapperProfile));
             services.AddScoped<IUserRegistrationService, UserRegistrationService>();
             services.AddScoped<IMastersService, MastersService>();
+            services.AddScoped<IAuthService, AuthService>();
             return services;
         }
     }

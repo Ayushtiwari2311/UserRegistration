@@ -1,4 +1,4 @@
-﻿namespace API.Configurations
+﻿namespace Presentation.Configurations
 {
     public static class CorsConfig
     {

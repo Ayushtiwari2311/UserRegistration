@@ -1,5 +1,5 @@
-﻿using API.Helpers.Image;
-namespace API.DependencyInjection
+﻿using Presentation.Helpers.Image;
+namespace Presentation.DependencyInjection
 {
 	public static class ServiceContainer
 	{

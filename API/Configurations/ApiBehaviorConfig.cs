@@ -1,7 +1,7 @@
 ﻿using DataTransferObjects.Response.Common;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Configurations
+namespace Presentation.Configurations
 {
     public static class ApiBehaviorConfig
     {

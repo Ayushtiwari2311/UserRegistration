@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Web.Services.Master;
+using MVC.Services.Master;
 
-namespace Web.Controllers
+namespace MVC.Controllers
 {
     [Route("[controller]")]
     public class MastersController(IMasterService _masterService) : Controller

@@ -4,9 +4,9 @@ namespace Application.UseCaseInterfaces
 {
     public interface IMastersService
     {
-        Task<IEnumerable<DropDownResponseDTO>> GetGendersAsync();
-        Task<IEnumerable<DropDownResponseDTO>> GetHobbiesAsync();
-        Task<IEnumerable<DropDownResponseDTO>> GetStatesAsync();
-        Task<IEnumerable<DropDownResponseDTO>> GetCitiesAsync(int stateId);
+        Task<APIResponseDTO<IEnumerable<DropDownResponseDTO>>> GetStatesAsync();
+        Task<APIResponseDTO<IEnumerable<DropDownResponseDTO>>> GetHobbiesAsync();
+        Task<APIResponseDTO<IEnumerable<DropDownResponseDTO>>> GetGendersAsync();
+        Task<APIResponseDTO<IEnumerable<DropDownResponseDTO>>> GetCitiesAsync(int stateId);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using DataTransferObjects.Response.Common;
 using System.Threading.RateLimiting;
 
-namespace API.Configurations
+namespace Presentation.Configurations
 {
     public static class RateLimiterConfig
     {

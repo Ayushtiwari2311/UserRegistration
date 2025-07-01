@@ -1,9 +1,10 @@
 ﻿using Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DatabaseContext
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -16,6 +17,7 @@ namespace Infrastructure.DatabaseContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<TrnUserHobby>()
                 .HasKey(uh => new { uh.UserId, uh.HobbyId });
 

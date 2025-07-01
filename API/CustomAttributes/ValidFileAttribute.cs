@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API.CustomAttributes
+namespace Presentation.CustomAttributes
 {
     public class ValidFileAttribute : ValidationAttribute
     {

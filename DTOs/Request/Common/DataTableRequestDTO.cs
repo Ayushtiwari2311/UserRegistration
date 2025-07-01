@@ -20,5 +20,5 @@ namespace DataTransferObjects.Request.Common
 
         [RegularExpression("^[a-zA-Z0-9 ]*$", ErrorMessage = "Only Alphabets and Numbers allowed.")]
         public string? searchValue { get; set; }
-    }
+    } 
 }

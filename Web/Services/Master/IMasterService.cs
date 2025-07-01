@@ -1,6 +1,6 @@
 ﻿using DataTransferObjects.Response.Common;
 
-namespace Web.Services.Master
+namespace MVC.Services.Master
 {
     public interface IMasterService
     {

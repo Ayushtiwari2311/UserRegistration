@@ -1,49 +1,41 @@
-﻿using System.Text.Json;
-using Web.Models;
+﻿using System.Net;
+using System.Text.Json;
+using DataTransferObjects.Response.Common;
+using MVC.Models;
 
-namespace Web.Helper
+namespace MVC.Helper
 {
     public static class HttpClientExtensions
     {
-        public static async Task<ApiResponseResult<T>> ReadApiResponseAsync<T>(this HttpResponseMessage response,string? jsonDataKey = null)
+        public static async Task<APIResponseDTO<T>> ReadApiResponseAsync<T>(this HttpResponseMessage response, HttpContext? httpContext = null)
         {
-            var result = new ApiResponseResult<T>
-            {
-                StatusCode = response.StatusCode,
-                Success = response.IsSuccessStatusCode
-            };
-
             var contentStream = await response.Content.ReadAsStreamAsync();
 
             try
             {
-                using var doc = await JsonDocument.ParseAsync(contentStream);
+                var result = await JsonSerializer.DeserializeAsync<APIResponseDTO<T>>(contentStream, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase // optional, for clarity
+                });
 
-                if (jsonDataKey != null && doc.RootElement.TryGetProperty(jsonDataKey, out var dataElement))
+                if (response.StatusCode == HttpStatusCode.Unauthorized && httpContext != null)
                 {
-                    result.Data = JsonSerializer.Deserialize<T>(dataElement.GetRawText(), new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
+                    // Clear token cookie
+                    httpContext.Response.Cookies.Delete("jwt_token");
+
+                    // Do a redirect (only works if still in pipeline)
+                    httpContext.Response.Redirect("/Auth/Login");
                 }
-                else if (response.IsSuccessStatusCode)
-                {
-                    result.Data = JsonSerializer.Deserialize<T>(doc.RootElement.GetRawText(), new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                }
-                else
-                {
-                    result.ErrorMessage = doc.RootElement.ToString();
-                }
+
+
+                // Handle null (edge case: empty body or deserialization failed silently)
+                return result ?? APIResponseDTO<T>.Fail("Empty or invalid response", response.StatusCode);
             }
-            catch (JsonException jsonEx)
+            catch (JsonException ex)
             {
-                result.ErrorMessage = $"Deserialization failed: {jsonEx.Message}";
+                return APIResponseDTO<T>.Fail($"Deserialization error: {ex.Message}", response.StatusCode);
             }
-
-            return result;
         }
     }
 }

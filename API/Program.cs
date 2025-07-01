@@ -1,6 +1,6 @@
-using API.Configurations;
-using API.DependencyInjection;
-using API.Handler;
+﻿using Presentation.Configurations;
+using Presentation.DependencyInjection;
+using Presentation.Handler;
 using Application.DependencyInjection;
 using DataTransferObjects.Response.Common;
 using Infrastructure.DependencyInjection;
@@ -26,6 +26,12 @@ builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
 
+// Add Swagger
+builder.Services.AddSwaggerDocumentation();
+
+// 👇 Add Identity and JWT config via extension
+builder.Services.AddAuthenticationServices(builder.Configuration);
+
 builder.Services.AddCorsPolicy(builder.Environment);
 
 builder.Host.UseSerilog((context, services, configuration) =>
@@ -43,8 +49,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerDocumentation();
 }
 
 app.UseHttpsRedirection();
@@ -53,6 +58,7 @@ app.UseCors(CorsConfig.GetPolicyName());
 app.UseRateLimiter();
 app.UseExceptionHandler();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
