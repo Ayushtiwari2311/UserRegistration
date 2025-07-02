@@ -42,16 +42,17 @@ namespace Application.UseCaseImplementation
             return response;
         }
 
-        public async Task<DataTableResponseDTO<GetUserResponseDTO>> GetAllAsync(GetUserRequestListDTO dto)
+        public async Task<APIResponseDTO<DataTableResponseDTO<GetUserResponseDTO>>> GetAllAsync(GetUserRequestListDTO dto)
         {
             var usersRepData = await repository.GetAllAsync(dto);
-            return new DataTableResponseDTO<GetUserResponseDTO>
+            var userSerData = new DataTableResponseDTO<GetUserResponseDTO>
             {
                 draw = dto.Draw,
                 recordsTotal = usersRepData.recordsTotal,
                 recordsFiltered = usersRepData.recordsFiltered,
                 data = mapper.Map<List<GetUserResponseDTO>>(usersRepData.data)
             };
+            return APIResponseDTO<DataTableResponseDTO<GetUserResponseDTO>>.Ok(userSerData);
         }
 
         public async Task<APIResponseDTO<GetUserResponseDTO>> GetUserDetails(string email)

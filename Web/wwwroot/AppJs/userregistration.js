@@ -108,23 +108,33 @@ function initializeDataTable() {
         processing: true,
         serverSide: true,
         searching: false,
+        order: [[8, 'desc']], // Sort by CreatedDate descending
         ajax: function (data, callback) {
             const params = {
                 start: data.start,
                 length: data.length,
                 searchValue: $('#searchName').val(),
                 stateId: $('#filterState').val(),
-                cityId: $('#filterCity').val()
+                cityId: $('#filterCity').val(),
+                sortColumn: data.columns[data.order[0].column].data,
+                sortDirection: data.order[0].dir
             };
 
-            $.get(`${hostUrl}/UserRegistration`, params, function (res) {
+            $.get(`/User/GetAll`, params, function (res) {
                 callback({
-                    recordsTotal: res.recordsTotal,
-                    recordsFiltered: res.recordsFiltered,
-                    data: res.data
+                    recordsTotal: res.data.recordsTotal,
+                    recordsFiltered: res.data.recordsFiltered,
+                    data: res.data.data
                 });
             });
         },
+        columnDefs: [
+            {
+                targets: [7, 8], // 0-based index: Hobbies, Photo
+                orderable: false,
+                className: 'no-sort' // Optional: add class to identify non-sortable columns
+            }
+        ],
         columns: [
             { data: 'name' },
             { data: 'gender' },

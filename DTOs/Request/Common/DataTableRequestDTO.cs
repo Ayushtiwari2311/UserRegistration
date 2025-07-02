@@ -20,5 +20,10 @@ namespace DataTransferObjects.Request.Common
 
         [RegularExpression("^[a-zA-Z0-9 ]*$", ErrorMessage = "Only Alphabets and Numbers allowed.")]
         public string? searchValue { get; set; }
+        [RegularExpression("^[a-zA-Z0-9 ]*$", ErrorMessage = "Only Alphabets and Numbers allowed.")]
+        public string SortColumn { get; set; } = "CreatedOn";
+
+        [RegularExpression("^[a-zA-Z0-9 ]*$", ErrorMessage = "Only Alphabets and Numbers allowed.")]
+        public string SortDirection { get; set; } = "desc";
     } 
 }

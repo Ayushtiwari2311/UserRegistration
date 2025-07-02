@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataTransferObjects.Response.Common
 {
-    public class DataTableResponseDTO<T>
+    public class DataTableResponseDTO<T> 
     {
         public int draw { get; set; }
         public int recordsTotal { get; set; }

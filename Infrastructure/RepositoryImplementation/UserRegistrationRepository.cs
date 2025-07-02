@@ -3,6 +3,7 @@ using DataTransferObjects.Response.Common;
 using Domain.Entities;
 using Domain.RepositoryInterfaces;
 using Infrastructure.DatabaseContext;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.RepositoryImplementation
@@ -41,8 +42,30 @@ namespace Infrastructure.RepositoryImplementation
 
             var totalCountFiltered = await query.CountAsync();
 
+            var allowedSortColumns = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "name", "Name" },
+                    { "gender", "Gender.Name" },
+                    { "state", "State.Name" },
+                    { "city", "City.Name" },
+                    { "dateOfBirth", "DateOfBirth" },
+                    { "email", "Email" },
+                    { "mobile", "Mobile" },
+                    { "contactNo", "ContactNo" },
+                    { "createdOn", "CreatedOn" }
+                };
+
+            string sortColumn = allowedSortColumns.TryGetValue(dto.SortColumn ?? string.Empty, out var mappedColumn)
+                    ? mappedColumn
+                    : "CreatedOn"; 
+
+            bool ascending = dto.SortDirection?.ToLower() == "asc";
+
+            // Apply sorting using dynamic extension
+            query = query.OrderByDynamic(sortColumn, ascending);
+
+
             var users = await query
-                        .OrderBy(u => u.Name)
                         .Skip(dto.Start * dto.Length)
                         .Take(dto.Length)
                         .ToListAsync();

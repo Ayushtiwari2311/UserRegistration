@@ -13,7 +13,6 @@ namespace Infrastructure.DependencyInjection
             (this IServiceCollection services, IConfiguration config)
         {
 
-
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
             services.AddDbContext<LoggingDbContext>(options =>

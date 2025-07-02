@@ -26,6 +26,7 @@ builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
 
+
 // Add Swagger
 builder.Services.AddSwaggerDocumentation();
 

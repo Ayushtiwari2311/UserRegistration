@@ -9,7 +9,7 @@ namespace Application.UseCaseInterfaces
 {
     public interface IUserRegistrationService
     {
-        Task<DataTableResponseDTO<GetUserResponseDTO>> GetAllAsync(GetUserRequestListDTO dto);
+        Task<APIResponseDTO<DataTableResponseDTO<GetUserResponseDTO>>> GetAllAsync(GetUserRequestListDTO dto);
         Task<APIResponseDTO> AddAsync(SaveUserResgistrationDTO dto, FileUploadRequestDto photoDto);
         Task<APIResponseDTO<GetUserResponseDTO>> GetUserDetails(string email);
     }

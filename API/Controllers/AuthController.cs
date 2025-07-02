@@ -19,24 +19,14 @@ namespace Presentation.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterAPIUserRequestModel model)
         {
             var response = await _authService.RegisterAsync(model);
-            if (!response.IsSuccess)
-                return StatusCode(((int)response.StatusCode),response);
-            return Ok(response);
+            return StatusCode(((int)response.StatusCode),response);
         }
 
-        /// <summary>
-        /// Authenticates a user and returns a JWT token.
-        /// </summary>
-        /// <param name="model">Login credentials</param>
-        /// <returns>JWT token if valid</returns>
         [HttpPost("login")]
-        //[SwaggerRequestExample(typeof(LoginRequest), typeof(LoginRequestExample))]
         public async Task<IActionResult> Login([FromBody] LoginUserRequestModel model)
         {
             var response = await _authService.LoginAsync(model);
-            if (!response.IsSuccess)
-                return StatusCode(((int)response.StatusCode), response);
-            return Ok(response);
+            return StatusCode(((int)response.StatusCode), response);
         }
     }
 }
