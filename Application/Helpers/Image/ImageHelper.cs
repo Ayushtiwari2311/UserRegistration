@@ -1,9 +1,10 @@
-﻿namespace Presentation.Helpers.Image
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Application.Helpers.Image
 {
 	public class ImageHelper(IHttpContextAccessor _httpContextAccessor) : IImageHelper
 	{
 		private readonly string _path = @"wwwroot/Images";
-		private readonly IHttpContextAccessor _httpContextAccessor;
 
 		public async Task<string> SaveImageAsync(IFormFile imageFile, string folderName)
 		{
@@ -33,22 +34,22 @@
 			var scheme = request.Scheme;
 			var host = request.Host.Value;
 
-			imageUrl = $"{scheme}://{host}/api/image/getimage?folderName={folderName}&fileName={fileName}";
+			imageUrl = $"{scheme}://{host}/image?folderName={folderName}&fileName={fileName}";
 
 			return imageUrl;
 		}
 
-		public bool DeleteImage(string folderName, string fileName)
+		public Task<bool> DeleteImage(string folderName, string fileName)
 		{
 			var fullPath = Path.Combine(_path, folderName, fileName);
 
 			if (System.IO.File.Exists(fullPath))
 			{
 				System.IO.File.Delete(fullPath);
-				return true;
+				return Task.FromResult(true);
 			}
 
-			return false;
+			return Task.FromResult(true);
 		}
 
 		public async Task<string> UpdateImageAsync(IFormFile newImageFile, string folderName, string oldFileName = null)

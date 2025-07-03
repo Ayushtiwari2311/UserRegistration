@@ -39,7 +39,11 @@ export const userApi = {
     login: (data) => api.post('/Auth/login', data),
     register: (data) => api.post('/Auth/register', data),
     getUsers: (params) => api.get('/UserRegistration', { params }),
-    registerUser: (data) => api.post('/UserRegistration', data),
+    registerUser: (data) => api.post('/UserRegistration', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        }),
     getStates: () => api.get('/Masters/states'),
     getCities: (stateId) => api.get(`/Masters/cities/${stateId}`),
     getHobbies: () => api.get('/Masters/hobbies'),

@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using DataTransferObjects.CustomAttributes;
 using Domain.CustomAttributes;
+using Microsoft.AspNetCore.Http;
 
 namespace DataTransferObjects.Request.User
 {
     public class SaveUserResgistrationDTO
     {
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(100, ErrorMessage = "Name can't be longer than 100 characters.")]
         public string Name { get; set; }
@@ -44,6 +49,8 @@ namespace DataTransferObjects.Request.User
         [MinLength(1, ErrorMessage = "At least one hobby must be selected.")]
         public List<int> Hobbies { get; set; }
 
+        [ValidFile(new[] { ".jpg", ".png" }, maxFileSizeMB: 2)]
+        public IFormFile Photo { get; set; }
         public string? PhotoPath { get; set; }
     }
 }

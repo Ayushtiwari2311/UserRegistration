@@ -11,6 +11,6 @@ namespace DataTransferObjects.Response.Common
         public int draw { get; set; }
         public int recordsTotal { get; set; }
         public int recordsFiltered { get; set; }
-        public List<T> data { get; set; }
+        public IEnumerable<T> data { get; set; } = new List<T>();
     }
 }

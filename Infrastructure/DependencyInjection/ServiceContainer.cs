@@ -20,6 +20,7 @@ namespace Infrastructure.DependencyInjection
 
             services.AddScoped<IUserRegistrationRepository, UserRegistrationRepository>();
             services.AddScoped<IMastersRepository, MastersRepository>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             return services;
         }
     }

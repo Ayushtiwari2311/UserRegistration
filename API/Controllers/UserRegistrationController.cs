@@ -1,14 +1,14 @@
-﻿using Presentation.DTOs;
-using Application.UseCaseInterfaces;
+﻿using Application.UseCaseInterfaces;
 using DataTransferObjects.Request.Common;
 using DataTransferObjects.Request.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Presentation.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("[controller]")]
     [ApiController]
     public class UserRegistrationController(IUserRegistrationService service) : ControllerBase
@@ -17,36 +17,28 @@ namespace Presentation.Controllers
         public async Task<IActionResult> GetAll([FromQuery] GetUserRequestListDTO dto)
         { 
             var result = await service.GetAllAsync(dto);
-            return Ok(result);
+            return StatusCode(((int)result.StatusCode),result);
         }
 
-        [HttpGet("{email}")]
-        public async Task<IActionResult> Get([FromRoute] string email)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(Guid id)
         {
-            var result = await service.GetUserDetails(email);
-            return Ok(result);
+            var result = await service.GetByIdAsync(id);
+            return StatusCode(((int)result.StatusCode), result);
         }
 
-        /// <summary>
-        /// Add user
-        /// </summary>
-        /// <returns>Response</returns>
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] AddUserRegistrationDTO dto)
+        public async Task<IActionResult> Add([FromForm] SaveUserResgistrationDTO dto)
         {
-            FileUploadRequestDto photoDto = null;
-            if (dto.Photo != null && dto.Photo.Length > 0)
-            {
-                using var ms = new MemoryStream();
-                await dto.Photo.CopyToAsync(ms);
-                photoDto = new FileUploadRequestDto
-				{
-                    FileName = dto.Photo.FileName,
-                    ContentType = dto.Photo.ContentType,
-                    FileData = ms.ToArray()
-                };
-            }
-            return Ok(await service.AddAsync(dto, photoDto));
+            var result = await service.AddAsync(dto);
+            return StatusCode(((int)result.StatusCode), result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await service.DeleteAsync(id);
+            return StatusCode(((int)result.StatusCode), result);
         }
     }
 }

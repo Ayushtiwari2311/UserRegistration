@@ -1,4 +1,4 @@
-﻿namespace Presentation.Helpers
+﻿namespace Application.Helpers
 {
     public class Constants
     {

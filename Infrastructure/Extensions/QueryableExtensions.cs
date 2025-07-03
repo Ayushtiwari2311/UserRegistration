@@ -9,28 +9,20 @@ namespace Infrastructure.Extensions
 {
     public static class QueryableExtensions
     {
-        public static IOrderedQueryable<T> OrderByDynamic<T>(this IQueryable<T> source, string sortColumn, bool ascending)
+        public static IQueryable<T> OrderByDynamic<T>(this IQueryable<T> query, string propertyName, bool ascending = true)
         {
-            var parameter = Expression.Parameter(typeof(T), "e");
-
-            Expression propertyAccess = parameter;
-
-            foreach (var member in sortColumn.Split('.'))
-            {
-                propertyAccess = Expression.PropertyOrField(propertyAccess, member);
-            }
-
-            var lambda = Expression.Lambda(propertyAccess, parameter);
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = propertyName.Split('.').Aggregate<string, Expression>(parameter, Expression.PropertyOrField);
+            var lambda = Expression.Lambda(property, parameter);
 
             string methodName = ascending ? "OrderBy" : "OrderByDescending";
 
-            var result = typeof(Queryable).GetMethods()
+            var method = typeof(Queryable).GetMethods()
                 .Where(m => m.Name == methodName && m.GetParameters().Length == 2)
                 .Single()
-                .MakeGenericMethod(typeof(T), propertyAccess.Type)
-                .Invoke(null, new object[] { source, lambda });
+                .MakeGenericMethod(typeof(T), property.Type);
 
-            return (IOrderedQueryable<T>)result!;
+            return (IQueryable<T>)method.Invoke(null, new object[] { query, lambda })!;
         }
     }
 }

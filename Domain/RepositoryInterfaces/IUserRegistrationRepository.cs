@@ -4,11 +4,10 @@ using Domain.Entities;
 
 namespace Domain.RepositoryInterfaces
 {
-    public interface IUserRegistrationRepository
+    public interface IUserRegistrationRepository : IGenericRepository<TrnUserRegistration>
     {
-        Task<DataTableResponseDTO<TrnUserRegistration>> GetAllAsync(GetUserRequestListDTO dto);
-        Task AddAsync(TrnUserRegistration userRegistration);
         Task<bool> CheckUserExistsByEmail(string email);
+        Task<DataTableResponseDTO<TrnUserRegistration>> GetAllAsync(GetUserRequestListDTO dto);
         Task<APIResponseDTO<TrnUserRegistration>> GetUserDetails(string email);
     }
 }

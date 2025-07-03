@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.CustomAttributes
+namespace DataTransferObjects.CustomAttributes
 {
-    public class ValidFileAttribute : ValidationAttribute
+    internal class ValidFileAttribute : ValidationAttribute
     {
         private readonly string[] _allowedExtensions;
         private readonly long _maxFileSizeInBytes;

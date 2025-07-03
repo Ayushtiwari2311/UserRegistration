@@ -12,7 +12,6 @@ namespace Domain.Entities
         public Guid Id { get; set; }
         public string Name { get; set; }
         public int GenderId { get; set; }
-
         [Column(TypeName = "date")]
         public DateTime DateOfBirth { get; set; }
         public string Email { get; set; }
