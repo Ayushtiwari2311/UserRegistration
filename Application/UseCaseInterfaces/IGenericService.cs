@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.UseCaseInterfaces
 {
-    public interface IGenericService<TEntity, TSaveDto, TGetDto>
+    public interface IGenericService<TEntity, TSaveDto,TUpdateDto, TGetDto>
     where TEntity : class
     {
         Task<APIResponseDTO<DataTableResponseDTO<TGetDto>>> GetAllAsync(
@@ -19,9 +19,10 @@ namespace Application.UseCaseInterfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
         Task<APIResponseDTO> AddAsync(TSaveDto dto);
-        Task<APIResponseDTO> UpdateAsync(TSaveDto entity);
+        Task<APIResponseDTO> UpdateAsync(object id,TUpdateDto entity);
+        Task<APIResponseDTO> PatchAsync(object id, Dictionary<string, object> updatedFields);
         Task<APIResponseDTO> DeleteAsync(object id);
-        Task<APIResponseDTO<TGetDto>> GetByIdAsync(object id);
+        Task<APIResponseDTO<TGetDto>> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
         Task<APIResponseDTO> SaveChangesAsync();
     }
 }

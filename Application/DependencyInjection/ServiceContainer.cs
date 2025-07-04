@@ -17,7 +17,7 @@ namespace Application.DependencyInjection
             });
             services.AddTransient<ImageUrlResolver>();
             services.AddScoped<IUserRegistrationService, UserRegistrationService>();
-            services.AddScoped(typeof(IGenericService<,,>), typeof(GenericService<,,>));
+            services.AddScoped(typeof(IGenericService<,,,>), typeof(GenericService<,,,>));
             services.AddScoped<IMastersService, MastersService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IImageHelper, ImageHelper>();

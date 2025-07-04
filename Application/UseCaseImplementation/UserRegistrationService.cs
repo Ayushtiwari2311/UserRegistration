@@ -1,5 +1,6 @@
 ﻿using Application.Helpers;
 using Application.Helpers.Image;
+using Application.Helpers.Patch;
 using Application.UseCaseInterfaces;
 using AutoMapper;
 using DataTransferObjects.Request.Common;
@@ -10,6 +11,7 @@ using Domain.Entities;
 using Domain.RepositoryInterfaces;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -18,90 +20,27 @@ namespace Application.UseCaseImplementation
     public class UserRegistrationService(
     IUserRegistrationRepository repository,
     IMapper mapper,
-    IImageHelper imageHelper
-) : GenericService<TrnUserRegistration, SaveUserResgistrationDTO, GetUserResponseDTO>(repository, mapper),
+    IImageHelper imageHelper,
+    IPatchHelper patchHelper
+) : GenericService<TrnUserRegistration, SaveUserResgistrationDTO,UpdateUserRegistrationDTO, GetUserResponseDTO>(repository, mapper),
     IUserRegistrationService
     {
         public new async Task<APIResponseDTO> AddAsync(SaveUserResgistrationDTO dto)
         {
-            var response = APIResponseDTO.Ok();
-
-            // Save image if uploaded
-            if (dto?.Photo != null)
+            dto.PhotoPath = await imageHelper.SaveImageAsync(dto.Photo, Constants.UserProfileImages);
+            if (!await repository.CheckUserExistsByEmail(dto.Email))
             {
-                dto.PhotoPath = await imageHelper.SaveImageAsync(dto.Photo, Constants.UserProfileImages);
-            }
-
-            if (dto.Id == Guid.Empty)
-            {
-                // ➕ Create new
-                if (!await repository.CheckUserExistsByEmail(dto.Email))
-                {
-                    var user = _mapper.Map<TrnUserRegistration>(dto);
-                    user.Id = Guid.NewGuid();
-                    await _repository.AddAsync(user);
-                    await _repository.SaveChangesAsync();
-                    response = APIResponseDTO.Ok("User created successfully.");
+                var response = await base.AddAsync(dto);
+                if (!response.IsSuccess) { 
+                    imageHelper.DeleteImage(Constants.UserProfileImages, dto.PhotoPath);
                 }
-                else
-                {
-                    response = APIResponseDTO.Fail($"User already exists with email {dto.Email}!");
-                }
+                return response;
             }
             else
-            {
-                var existingUser = await _repository.GetByIdAsync(dto.Id);
-
-                if (existingUser == null)
-                    return APIResponseDTO.Fail("User not found for update.");
-
-                if (!string.IsNullOrWhiteSpace(dto.Name))
-                    existingUser.Name = dto.Name;
-
-                if (dto.Gender > 0)
-                    existingUser.GenderId = dto.Gender;
-
-                if (dto.DateOfBirth != default)
-                    existingUser.DateOfBirth = dto.DateOfBirth;
-
-                if (!string.IsNullOrWhiteSpace(dto.Email))
-                    existingUser.Email = dto.Email;
-
-                if (!string.IsNullOrWhiteSpace(dto.Mobile))
-                    existingUser.Mobile = dto.Mobile;
-
-                if (!string.IsNullOrWhiteSpace(dto.ContactNo))
-                    existingUser.ContactNo = dto.ContactNo;
-
-                if (dto.State > 0)
-                    existingUser.StateId = dto.State;
-
-                if (dto.City > 0)
-                    existingUser.CityId = dto.City;
-
-                if (!string.IsNullOrEmpty(dto.PhotoPath))
-                    existingUser.PhotoPath = dto.PhotoPath;
-
-                if (dto.Hobbies != null && dto.Hobbies.Count > 0)
-                {
-                    existingUser.UserHobbies?.Clear();
-                    existingUser.UserHobbies = dto.Hobbies.Select(hobbyId => new TrnUserHobby
-                    {
-                        HobbyId = hobbyId,
-                        UserId = existingUser.Id
-                    }).ToList();
-                }
-
-                await _repository.UpdateAsync(existingUser);
-                await _repository.SaveChangesAsync();
-
-                return APIResponseDTO.Ok("User updated successfully.");
-            }
-
-            return response;
+                return APIResponseDTO.Fail($"User already exists with email {dto.Email}!");
         }
 
-        public async Task<APIResponseDTO<DataTableResponseDTO<GetUserResponseDTO>>> GetAllAsync(GetUserRequestListDTO dto)
+        public new async Task<APIResponseDTO<DataTableResponseDTO<GetUserResponseDTO>>> GetAllAsync(GetUserRequestListDTO dto)
         {
             Expression<Func<TrnUserRegistration, bool>>? filter = null;
 
@@ -131,14 +70,6 @@ namespace Application.UseCaseImplementation
                                                                        .ThenInclude(uh => uh.Hobby));
         }
 
-        public async Task<APIResponseDTO<GetUserResponseDTO>> GetUserDetails(string email)
-        {
-            var response = await repository.GetUserDetails(email);
-            return response.IsSuccess
-                ? APIResponseDTO<GetUserResponseDTO>.Ok(mapper.Map<GetUserResponseDTO>(response.Data))
-                : APIResponseDTO<GetUserResponseDTO>.Fail(response.Message);
-        }
-
         public new async Task<APIResponseDTO> DeleteAsync(Guid Id)
         {
             var record = await repository.GetByIdAsync(Id);
@@ -148,6 +79,89 @@ namespace Application.UseCaseImplementation
                 await imageHelper.DeleteImage(Constants.UserProfileImages, record.PhotoPath);
             }
             return response;
+        }
+
+        public new async Task<APIResponseDTO> UpdateAsync(Guid id, UpdateUserRegistrationDTO dto)
+        {
+            using var transaction = await repository.BeginTransactionAsync();
+            try
+            {
+                var dbEntity = await repository.GetByIdAsync(id);
+                if (dbEntity == null)
+                    return APIResponseDTO.Fail("Record not found.");
+
+                dto.PhotoPath = dto.Photo != null
+                        ? await imageHelper.UpdateImageAsync(dto.Photo, Constants.UserProfileImages, dbEntity.PhotoPath) :
+                         dbEntity.PhotoPath;
+
+                if (dto.Hobbies is { Count: > 0 })
+                {
+                    var newHobbies = dto.Hobbies.Distinct().Select(hobbyId => new TrnUserHobby
+                    {
+                        HobbyId = hobbyId,
+                        UserId = dbEntity.Id
+                    }).ToList();
+
+                    await repository.UpdateHobbies(id, newHobbies);
+                }
+                var result =  await base.UpdateAsync(id, dto);
+                await repository.CommitTransactionAsync();
+                return result;
+            }
+            catch
+            {
+                await repository.RollbackTransactionAsync();
+                throw;
+            }
+        }
+
+        public new async Task<APIResponseDTO> PatchAsync(Guid id, PatchUserRegistrationDTO dto)
+        {
+            using var transaction = await repository.BeginTransactionAsync();
+            try
+            {
+                var dbEntity = await repository.GetByIdAsync(id);
+                if (dbEntity == null)
+                    return APIResponseDTO.Fail("Record not found.");
+
+                if (dto.Photo != null)
+                {
+                    dto.PhotoPath = await imageHelper.UpdateImageAsync(dto.Photo, Constants.UserProfileImages, dbEntity.PhotoPath);
+                    dto.Photo = null; // Clear the Photo property to avoid saving it again
+                }
+
+                var updatedFields = patchHelper.GetPatchedValues(dto);
+                if (dto.Hobbies is { Count: > 0 })
+                {
+                    var newHobbies = dto.Hobbies.Distinct().Select(hobbyId => new TrnUserHobby
+                    {
+                        HobbyId = hobbyId,
+                        UserId = dbEntity.Id
+                    }).ToList();
+
+
+                    await repository.UpdateHobbies(id, newHobbies);
+                    updatedFields.Remove("Hobbies");
+                }
+
+                var result = await base.PatchAsync(id, updatedFields);
+                await repository.CommitTransactionAsync();
+                return result;
+            }
+            catch {
+                await repository.RollbackTransactionAsync();
+                throw;
+            }
+        }
+
+        public new async Task<APIResponseDTO<GetUserResponseDTO>> GetByIdAsync(Guid id)
+        {
+            return await base.GetByIdAsync(id,query => query
+                                                     .Include(u => u.Gender)
+                                                     .Include(u => u.State)
+                                                     .Include(u => u.City)
+                                                     .Include(u => u.UserHobbies)
+                                                        .ThenInclude(uh => uh.Hobby));
         }
     }
 

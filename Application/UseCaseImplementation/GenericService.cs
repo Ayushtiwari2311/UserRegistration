@@ -1,4 +1,5 @@
-﻿using Application.UseCaseInterfaces;
+﻿using Application.Helpers.Patch;
+using Application.UseCaseInterfaces;
 using AutoMapper;
 using DataTransferObjects.Request.Common;
 using DataTransferObjects.Response.Common;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Application.UseCaseImplementation
 {
-    public class GenericService<TEntity, TSaveDto, TGetDto> : IGenericService<TEntity, TSaveDto, TGetDto>
+    public class GenericService<TEntity, TSaveDto, TUpdateDto, TGetDto>: IGenericService<TEntity, TSaveDto, TUpdateDto, TGetDto>
     where TEntity : class
     {
         protected readonly IGenericRepository<TEntity> _repository;
@@ -29,16 +30,41 @@ namespace Application.UseCaseImplementation
         {
             var entity = _mapper.Map<TEntity>(dto);
             await _repository.AddAsync(entity);
-            await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync();   
             return APIResponseDTO.Ok("Record added successfully.");
         }
 
-        public virtual async Task<APIResponseDTO> UpdateAsync(TSaveDto dto)
+        public virtual async Task<APIResponseDTO> UpdateAsync(object id, TUpdateDto dto)
         {
-            var entity = _mapper.Map<TEntity>(dto);
-            await _repository.UpdateAsync(entity);
+            var dbEntity = await _repository.GetByIdAsync(id);
+            if (dbEntity == null)
+                return APIResponseDTO.Fail("Record not found.");
+
+            _mapper.Map(dto,dbEntity);
+            await _repository.UpdateAsync(dbEntity);
             await _repository.SaveChangesAsync();
             return APIResponseDTO.Ok("Record updated successfully.");
+        }
+
+        public async Task<APIResponseDTO> PatchAsync(object id, Dictionary<string,object> updatedFields)
+        {
+            var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
+                return APIResponseDTO.Fail("Record not found.");
+
+            foreach (var kvp in updatedFields)
+            {
+                var prop = typeof(TEntity).GetProperty(kvp.Key);
+                if (prop != null && prop.CanWrite)
+                {
+                    prop.SetValue(entity, Convert.ChangeType(kvp.Value, prop.PropertyType));
+                }
+            }
+
+            await _repository.PatchAsync(entity, updatedFields.Keys);
+            await _repository.SaveChangesAsync();
+
+            return APIResponseDTO.Ok("Record updated.");
         }
 
         public virtual async Task<APIResponseDTO<DataTableResponseDTO<TGetDto>>> GetAllAsync(
@@ -60,9 +86,9 @@ namespace Application.UseCaseImplementation
             return APIResponseDTO<DataTableResponseDTO<TGetDto>>.Ok(responseDto);
         }
 
-        public virtual async Task<APIResponseDTO<TGetDto>> GetByIdAsync(object id)
+        public virtual async Task<APIResponseDTO<TGetDto>> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdAsync(id, include);
             if (entity is null)
                 return APIResponseDTO<TGetDto>.Fail("Record not found.");
 

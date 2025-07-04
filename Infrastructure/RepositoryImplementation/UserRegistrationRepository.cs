@@ -15,73 +15,18 @@ namespace Infrastructure.RepositoryImplementation
         public async Task<bool> CheckUserExistsByEmail(string email)
             => await _context.TrnUserRegistrations.AnyAsync(u => u.Email == email);
 
-        public async Task<DataTableResponseDTO<TrnUserRegistration>> GetAllAsync(GetUserRequestListDTO dto)
-        {
-            var query = _context.TrnUserRegistrations
-                .Include(u => u.Gender)
-                .Include(u => u.State)
-                .Include(u => u.City)
-                .Include(u => u.UserHobbies)
-                    .ThenInclude(uh => uh.Hobby)
-                .AsQueryable();
-
-            int totalCount = await query.CountAsync();
-
-            if (!string.IsNullOrEmpty(dto.searchValue))
-                query = query.Where(u => u.Name.Contains(dto.searchValue));
-
-            if (dto.StateId.HasValue)
-                query = query.Where(u => u.StateId == dto.StateId);
-
-            if (dto.CityId.HasValue)
-                query = query.Where(u => u.CityId == dto.CityId);
-
-            int filteredCount = await query.CountAsync();
-
-            var allowedSortColumns = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        public async Task UpdateHobbies(Guid userId,ICollection<TrnUserHobby> userHobbies) {
+            if (userHobbies is { Count: > 0 })
             {
-                { "name", "Name" },
-                { "gender", "Gender.Name" },
-                { "state", "State.Name" },
-                { "city", "City.Name" },
-                { "dateOfBirth", "DateOfBirth" },
-                { "email", "Email" },
-                { "mobile", "Mobile" },
-                { "contactNo", "ContactNo" },
-                { "createdOn", "CreatedOn" }
-            };
+                var existingHobbies = await _context.MUserHobbies.AsNoTracking()
+                    .Where(x => x.UserId == userId)
+                    .ToListAsync();
 
-            string sortColumn = allowedSortColumns.TryGetValue(dto.SortColumn ?? "", out var mapped) ? mapped : "CreatedOn";
-            bool ascending = dto.SortDirection?.ToLower() == "asc";
-            query = query.OrderByDynamic(sortColumn, ascending);
+                _context.MUserHobbies.RemoveRange(existingHobbies);
 
-            var users = await query
-                .Skip(dto.Start * dto.Length)
-                .Take(dto.Length)
-                .ToListAsync();
-
-            return new DataTableResponseDTO<TrnUserRegistration>
-            {
-                draw = dto.Draw,
-                recordsTotal = totalCount,
-                recordsFiltered = filteredCount,
-                data = users
-            };
-        }
-
-        public async Task<APIResponseDTO<TrnUserRegistration>> GetUserDetails(string email)
-        {
-            var user = await _context.TrnUserRegistrations
-                .Include(u => u.Gender)
-                .Include(u => u.State)
-                .Include(u => u.City)
-                .Include(u => u.UserHobbies)
-                    .ThenInclude(uh => uh.Hobby)
-                .FirstOrDefaultAsync(u => u.Email == email);
-
-            return user != null
-                ? APIResponseDTO<TrnUserRegistration>.Ok(user)
-                : APIResponseDTO<TrnUserRegistration>.Fail("No Record Found!");
-        }
+                await _context.MUserHobbies.AddRangeAsync(userHobbies);
+                await _context.SaveChangesAsync();
+            }
+        } 
     }
 }

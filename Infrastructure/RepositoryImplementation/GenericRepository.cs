@@ -7,13 +7,16 @@ using Infrastructure.Extensions;
 using System.Linq.Expressions;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Infrastructure.RepositoryImplementation
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
+
         protected readonly AppDbContext _context;
         protected readonly DbSet<T> _dbSet;
+        private IDbContextTransaction _transaction;
 
         public GenericRepository(AppDbContext context)
         {
@@ -21,7 +24,43 @@ namespace Infrastructure.RepositoryImplementation
             _dbSet = _context.Set<T>();
         }
 
-        public virtual async Task<T> GetByIdAsync(object id) => await _dbSet.FindAsync(id);
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            if (_transaction != null)
+                return _transaction;
+
+            _transaction = await _context.Database.BeginTransactionAsync();
+            return _transaction;
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.CommitAsync();
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+
+        public virtual async Task<T> GetByIdAsync(object id, 
+                                                Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null) 
+        {
+           IQueryable<T> query = _context.Set<T>();
+           if (include != null)
+              query = include(query); // supports ThenInclude
+           return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+        }
 
         public virtual async Task AddAsync(T entity)
         {
@@ -32,6 +71,19 @@ namespace Infrastructure.RepositoryImplementation
         {
             _dbSet.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
+        }
+
+        public async Task PatchAsync(T entity, IEnumerable<string> propertiesToUpdate)
+        {
+            var entityType = _context.Model.FindEntityType(typeof(T));
+            var entityProperties = entityType.GetProperties().Select(p => p.Name).ToHashSet();
+            foreach (var propertyName in propertiesToUpdate)
+            {
+                if (entityProperties.Contains(propertyName))
+                {
+                    _context.Entry(entity).Property(propertyName).IsModified = true;
+                }
+            }
         }
 
         public virtual async Task DeleteAsync(object id)

@@ -1,18 +1,20 @@
-﻿using System;
+﻿using DataTransferObjects.CustomAttributes;
+using Domain.CustomAttributes;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using DataTransferObjects.CustomAttributes;
-using Domain.CustomAttributes;
-using Microsoft.AspNetCore.Http;
 
 namespace DataTransferObjects.Request.User
 {
-    public class SaveUserResgistrationDTO
+    public class UpdateUserRegistrationDTO
     {
+        [Required(ErrorMessage = "User ID is required.")]
+        public Guid Id { get; set; }
+
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(100, ErrorMessage = "Name can't be longer than 100 characters.")]
         public string Name { get; set; }

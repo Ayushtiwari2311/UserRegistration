@@ -9,30 +9,58 @@ namespace Application.Helpers.Patch
 {
     public class PatchHelper : IPatchHelper
     {
-        public void PatchIfNotNull<T>(T source, T destination)
+        public void PatchIfNotNull<TSource, TTarget>(TSource source, TTarget target)
         {
-            if (source == null || destination == null) return;
+            if (source == null || target == null) return;
 
-            var type = typeof(T);
-            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                            .Where(p => p.CanRead && p.CanWrite);
+            var sourceProps = typeof(TSource).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var targetProps = typeof(TTarget).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                             .Where(p => p.CanWrite).ToDictionary(p => p.Name);
 
-            foreach (var prop in props)
+            foreach (var sp in sourceProps)
             {
-                var value = prop.GetValue(source);
+                if (!targetProps.TryGetValue(sp.Name, out var tp)) continue;
+                if (!tp.CanWrite || tp.PropertyType != sp.PropertyType) continue;
 
+                var value = sp.GetValue(source);
                 if (value == null) continue;
 
-                if (prop.PropertyType.IsValueType)
+                if (sp.PropertyType.IsValueType)
                 {
-                    // Skip default values for value types (e.g., 0, DateTime.MinValue)
-                    var defaultValue = Activator.CreateInstance(prop.PropertyType);
-                    if (value.Equals(defaultValue))
-                        continue;
+                    var defaultValue = Activator.CreateInstance(sp.PropertyType);
+                    if (value.Equals(defaultValue)) continue;
                 }
 
-                prop.SetValue(destination, value);
+                tp.SetValue(target, value);
             }
+        }
+
+        public Dictionary<string, object> GetPatchedValues<T>(T dto)
+        {
+            var patchedProperties = new Dictionary<string, object>();
+            var type = typeof(T);
+
+            foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (!prop.CanRead || prop.GetIndexParameters().Length > 0)
+                    continue;
+
+                var value = prop.GetValue(dto);
+                var defaultValue = GetDefault(prop.PropertyType);
+
+                // Check if value is different from default
+                if (value != null && !Equals(value, defaultValue))
+                {
+                    patchedProperties[prop.Name] = value;
+                }
+            }
+
+            return patchedProperties;
+        }
+
+        private object? GetDefault(Type type)
+        {
+            return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
     }
 }

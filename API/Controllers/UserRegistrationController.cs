@@ -34,6 +34,21 @@ namespace Presentation.Controllers
             return StatusCode(((int)result.StatusCode), result);
         }
 
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch(Guid id, [FromForm] PatchUserRegistrationDTO dto)
+        {
+            var result = await service.PatchAsync(id, dto);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromForm] UpdateUserRegistrationDTO dto)
+        {
+            dto.Id = id;
+            var result = await service.UpdateAsync(id,dto);
+            return StatusCode(((int)result.StatusCode), result);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

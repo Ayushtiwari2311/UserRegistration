@@ -17,7 +17,6 @@ namespace Application.AutoMapper
             .ForMember(user => user.Hobbies, opt => opt.MapFrom(src => src.UserHobbies.Select(h => h.Hobby.Name).ToList()));
 
             CreateMap<SaveUserResgistrationDTO, TrnUserRegistration>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.GenderId, opt => opt.MapFrom(src => src.Gender))
                 .ForMember(dest => dest.StateId, opt => opt.MapFrom(src => src.State))
                 .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.City))
@@ -29,6 +28,16 @@ namespace Application.AutoMapper
                     {
                         HobbyId = hobbyId
                     }).ToList()));
+
+            CreateMap<UpdateUserRegistrationDTO, TrnUserRegistration>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.GenderId, opt => opt.MapFrom(src => src.Gender))
+                .ForMember(dest => dest.StateId, opt => opt.MapFrom(src => src.State))
+                .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.City))
+                .ForMember(dest => dest.Gender, opt => opt.Ignore())
+                .ForMember(dest => dest.State, opt => opt.Ignore())
+                .ForMember(dest => dest.City, opt => opt.Ignore())
+                .ForMember(dest => dest.UserHobbies, opt => opt.Ignore());
         }
         
     }

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Helpers.Patch
 {
-    internal interface IPatchHelper
+    public interface IPatchHelper
     {
-        void PatchIfNotNull<T>(T source, T destination);
+        void PatchIfNotNull<TSource, TTarget>(TSource source, TTarget target);
+        Dictionary<string, object> GetPatchedValues<T>(T dto);
     }
 }
