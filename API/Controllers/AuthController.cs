@@ -28,5 +28,12 @@ namespace Presentation.Controllers
             var response = await _authService.LoginAsync(model);
             return StatusCode(((int)response.StatusCode), response);
         }
+
+        [HttpGet("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var response = await _authService.LogoutAsync();
+            return StatusCode(((int)response.StatusCode), response);
+        }
     }
 }

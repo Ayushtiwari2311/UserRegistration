@@ -11,6 +11,8 @@ namespace Application.UseCaseInterfaces
     public interface IAuthService
     {
         Task<APIResponseDTO> RegisterAsync(RegisterAPIUserRequestModel model);
-        Task<APIResponseDTO<string>> LoginAsync(LoginUserRequestModel model);
+        Task<APIResponseDTO> LoginAsync(LoginUserRequestModel model);
+
+        Task<APIResponseDTO> LogoutAsync();
     }
 }

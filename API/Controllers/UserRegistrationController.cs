@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Presentation.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class UserRegistrationController(IUserRegistrationService service) : ControllerBase

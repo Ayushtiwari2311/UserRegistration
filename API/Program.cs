@@ -53,8 +53,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerDocumentation();
 }
 
+app.UseMiddleware<JwtFromCookieMiddleware>();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseCors(CorsConfig.GetPolicyName());
 app.UseRateLimiter();
 app.UseExceptionHandler();

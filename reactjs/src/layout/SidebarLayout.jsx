@@ -1,5 +1,6 @@
-// src/components/layout/SidebarLayout.jsx
+﻿// src/components/layout/SidebarLayout.jsx
 import React from 'react';
+import { userApi } from '../api/userApi';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import {
     UserCircleIcon,
@@ -10,9 +11,22 @@ import {
 const SidebarLayout = () => {
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        navigate("/login");
+    const handleLogout = async () => {
+        try {
+            const res = await userApi.logout(); // ✅ awaits response
+            if (res.data?.isSuccess) {
+                navigate('/login'); // Redirect to login page
+            } else {
+                toast.error(res.data?.message || "Logout failed");
+            }
+        } catch (err) {
+            if (err.response) {
+                const message = err.response.data?.message || "Logout failed!";
+                toast.error(message);
+            } else {
+                toast.error("Network error or server is unavailable.");
+            }
+        }
     };
 
     return (

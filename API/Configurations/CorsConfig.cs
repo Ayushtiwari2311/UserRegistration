@@ -10,20 +10,22 @@
             {
                 options.AddPolicy(name: PolicyName, policy =>
                 {
-                    if (env.IsDevelopment())
-                    {
+                    //if (env.IsDevelopment())
+                    //{
+                    //    policy
+                    //        .AllowAnyOrigin()
+                    //        .AllowAnyHeader()
+                    //        .AllowAnyMethod()
+                    //        .AllowCredentials();
+                    //}
+                    //else
+                    //{
                         policy
-                            .AllowAnyOrigin()
+                            .WithOrigins("http://localhost:5173") // ✅ Exact origin of your React app
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    }
-                    else
-                    {
-                        policy
-                            .WithOrigins("https://localhost:7059") 
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    }
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    //}
                 });
             });
 

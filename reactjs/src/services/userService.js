@@ -8,6 +8,16 @@ export const userService = {
     async createUser(formData) {
         return await userApi.registerUser(formData);
     },
+    async updateUser(id,formData) {
+        return await userApi.updateUser(id,formData);
+    },
+    async getUser(id) {
+        return await userApi.getUser(id);
+    },
+    async deleteUser(formData) {
+        return await userApi.delete(formData);
+    },
+
     async fetchStates() {
         const res = await userApi.getStates();
         return res.data.data;

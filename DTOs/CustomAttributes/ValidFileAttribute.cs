@@ -7,16 +7,24 @@ namespace DataTransferObjects.CustomAttributes
     {
         private readonly string[] _allowedExtensions;
         private readonly long _maxFileSizeInBytes;
+        private readonly bool _isUpdate;
 
-        public ValidFileAttribute(string[] allowedExtensions, int maxFileSizeMB = 2)
+        public ValidFileAttribute(string[] allowedExtensions, int maxFileSizeMB = 2, bool isUpdate = false)
         {
             _allowedExtensions = allowedExtensions.Select(e => e.ToLower()).ToArray();
             _maxFileSizeInBytes = maxFileSizeMB * 1024 * 1024;
+            _isUpdate = isUpdate;
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            
             var file = value as IFormFile;
+            if (_isUpdate && file == null)
+            {
+                return ValidationResult.Success;
+            }
+
             if (file == null)
             {
                 return new ValidationResult("File is required.");

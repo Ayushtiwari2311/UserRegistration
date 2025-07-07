@@ -12,22 +12,19 @@ const LoginForm = () => {
         e.preventDefault();
         try {
             const res = await userApi.login(credentials); // will throw on 401, 500 etc.
-
             if (res.data?.isSuccess) {
-                localStorage.setItem('token', res.data.data);
+                /*localStorage.setItem('token', res.data.data);*/
                 navigate('/');
             } else {
                 toast.error(res.data?.message || "Login failed");
             }
         } catch (err) {
-            // ✅ Handle 401 or any failed HTTP call here
             if (err.response) {
                 const message = err.response.data?.message || "Login failed!";
                 toast.error(message);
             } else {
                 toast.error("Network error or server is unavailable.");
             }
-            console.error(err);
         }
     };
 

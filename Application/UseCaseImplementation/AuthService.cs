@@ -2,6 +2,7 @@
 using DataTransferObjects.Request.APIUser;
 using DataTransferObjects.Response.Common;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +19,8 @@ using System.Threading.Tasks;
 namespace Application.UseCaseImplementation
 {
     internal class AuthService(UserManager<ApplicationUser> _userManager,
-                            IConfiguration _configuration) : IAuthService
+                            IConfiguration _configuration,
+                            IHttpContextAccessor _httpContextAccessor) : IAuthService
     {
         public async Task<APIResponseDTO> RegisterAsync(RegisterAPIUserRequestModel model) {
             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
@@ -31,19 +33,19 @@ namespace Application.UseCaseImplementation
             return APIResponseDTO.Ok("User registered");
         }
 
-        public async Task<APIResponseDTO<string>> LoginAsync(LoginUserRequestModel model) {
-            APIResponseDTO<string> response;
+        public async Task<APIResponseDTO> LoginAsync(LoginUserRequestModel model) {
+            APIResponseDTO response;
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                response = APIResponseDTO<string>.Fail($"No user found by {model.Email}",HttpStatusCode.Unauthorized);
+                response = APIResponseDTO.Fail($"No user found by {model.Email}",HttpStatusCode.Unauthorized);
             }
             else
             {
                 if (!await _userManager.CheckPasswordAsync(user, model.Password))
                 {
-                    response = APIResponseDTO<string>.Fail($"Invalid Password!", HttpStatusCode.Unauthorized);
+                    response = APIResponseDTO.Fail($"Invalid Password!", HttpStatusCode.Unauthorized);
                 }
                 else
                 {
@@ -63,11 +65,34 @@ namespace Application.UseCaseImplementation
                         signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
 
-                    response = APIResponseDTO<string>.Ok(new JwtSecurityTokenHandler().WriteToken(token));
+                    _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", new JwtSecurityTokenHandler().WriteToken(token), new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddHours(3)
+                    });
+
+                    response = APIResponseDTO.Ok("User logged in successfully!");
                 }
             }
 
             return response;
+        }
+
+        public async Task<APIResponseDTO> LogoutAsync()
+        {
+            var deleteOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(-1) // Expired
+            };
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", "", deleteOptions);
+
+            return APIResponseDTO.Ok("Logged out successfully!");
         }
     }
 }

@@ -49,8 +49,8 @@ namespace DataTransferObjects.Request.User
         [MinLength(1, ErrorMessage = "At least one hobby must be selected.")]
         public List<int> Hobbies { get; set; }
 
-        [ValidFile(new[] { ".jpg", ".png" }, maxFileSizeMB: 2)]
-        public IFormFile Photo { get; set; }
+        [ValidFile(new[] { ".jpg", ".png" }, maxFileSizeMB: 2,isUpdate:true)]
+        public IFormFile? Photo { get; set; }
         public string? PhotoPath { get; set; }
     }
 }

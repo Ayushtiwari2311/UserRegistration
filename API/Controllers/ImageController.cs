@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Presentation.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class ImageController : ControllerBase

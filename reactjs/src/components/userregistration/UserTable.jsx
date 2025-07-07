@@ -1,6 +1,10 @@
 ﻿import React, { useState } from 'react';
+import AuthorizedImage from '../common/AuthorizedImage';
+import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 
-const UserTable = ({ users }) => {
+
+
+const UserTable = ({ users, onDelete, onEdit }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedPhoto, setSelectedPhoto] = useState(null);
 
@@ -23,6 +27,7 @@ const UserTable = ({ users }) => {
                         <th className="px-6 py-3">City</th>
                         <th className="px-6 py-3">Hobbies</th>
                         <th className="px-6 py-3">Photo</th>
+                        <th className="px-6 py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,12 +45,33 @@ const UserTable = ({ users }) => {
                                     {Array.isArray(user.hobbies) ? user.hobbies.join(', ') : user.hobbies}
                                 </td>
                                 <td className="px-6 py-4">
+                                    {/*<AuthorizedImage*/}
+                                    {/*    src={user.photoPath}*/}
+                                    {/*    alt="User"*/}
+                                    {/*    onClick={() => handleImageClick(user.photoPath)}*/}
+                                    {/*    className="w-10 h-10 object-cover rounded-full border cursor-pointer hover:scale-110 transition-transform duration-200"*/}
+                                    {/*/>*/}
                                     <img
                                         src={user.photoPath}
                                         alt="User"
                                         onClick={() => handleImageClick(user.photoPath)}
                                         className="w-10 h-10 object-cover rounded-full border cursor-pointer hover:scale-110 transition-transform duration-200"
                                     />
+                                </td>
+                                <td className="px-6 py-4 flex gap-2 items-center">
+                                    <button
+                                        onClick={() => onDelete(user.id)}
+                                        className="text-red-600 hover:text-red-800 transition duration-200"
+                                        title="Delete"
+                                    >
+                                        <TrashIcon className="w-6 h-6" />
+                                    </button>
+                                    <button
+                                        onClick={() => onEdit(user)}
+                                        className="text-blue-600 hover:text-blue-800 transition duration-200"
+                                    >
+                                        <PencilSquareIcon className="w-6 h-6" />
+                                    </button>
                                 </td>
                             </tr>
                         ))
@@ -75,7 +101,7 @@ const UserTable = ({ users }) => {
                         >
                             ×
                         </button>
-                        <img
+                        <AuthorizedImage
                             src={selectedPhoto}
                             alt="Full Size"
                             className="max-w-[80vw] max-h-[80vh] rounded-md border border-gray-300"
