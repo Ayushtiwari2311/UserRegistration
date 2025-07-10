@@ -14,6 +14,7 @@ const api = axios.create({
 // Automatically attach token if it exists
 api.interceptors.request.use(
     (config) => {
+        store.setLoading(true);
         return config;
     },
     (error) => {

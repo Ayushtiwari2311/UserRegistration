@@ -4,7 +4,7 @@ import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 
 
 
-const UserTable = ({ users, onDelete, onEdit }) => {
+const UserTable = ({ users, onDelete, onEdit, onSort }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedPhoto, setSelectedPhoto] = useState(null);
 
@@ -18,13 +18,13 @@ const UserTable = ({ users, onDelete, onEdit }) => {
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th className="px-6 py-3">Name</th>
-                        <th className="px-6 py-3">Email</th>
-                        <th className="px-6 py-3">Mobile</th>
-                        <th className="px-6 py-3">Gender</th>
-                        <th className="px-6 py-3">DOB</th>
-                        <th className="px-6 py-3">State</th>
-                        <th className="px-6 py-3">City</th>
+                        <th onClick={() => onSort('name')} className="cursor-pointer px-6 py-3 hover:underline">Name</th>
+                        <th onClick={() => onSort('email')} className="cursor-pointer px-6 py-3 hover:underline">Email</th>
+                        <th onClick={() => onSort('mobile')} className="cursor-pointer px-6 py-3 hover:underline">Mobile</th>
+                        <th onClick={() => onSort('gender')} className="cursor-pointer px-6 py-3 hover:underline">Gender</th>
+                        <th onClick={() => onSort('dob')} className="cursor-pointer px-6 py-3 hover:underline">DOB</th>
+                        <th onClick={() => onSort('state')} className="cursor-pointer px-6 py-3 hover:underline">State</th>
+                        <th onClick={() => onSort('city')} className="cursor-pointer px-6 py-3 hover:underline">City</th>
                         <th className="px-6 py-3">Hobbies</th>
                         <th className="px-6 py-3">Photo</th>
                         <th className="px-6 py-3">Actions</th>
@@ -101,7 +101,7 @@ const UserTable = ({ users, onDelete, onEdit }) => {
                         >
                             ×
                         </button>
-                        <AuthorizedImage
+                        <img
                             src={selectedPhoto}
                             alt="Full Size"
                             className="max-w-[80vw] max-h-[80vh] rounded-md border border-gray-300"

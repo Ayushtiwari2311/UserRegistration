@@ -25,19 +25,24 @@ namespace Application.UseCaseImplementation
 ) : GenericService<TrnUserRegistration, SaveUserResgistrationDTO,UpdateUserRegistrationDTO, GetUserResponseDTO>(repository, mapper),
     IUserRegistrationService
     {
-        public new async Task<APIResponseDTO> AddAsync(SaveUserResgistrationDTO dto)
+        public new async Task<APIResponseDTO<GetUserResponseDTO>> AddAsync(SaveUserResgistrationDTO dto)
         {
             dto.PhotoPath = await imageHelper.SaveImageAsync(dto.Photo, Constants.UserProfileImages);
             if (!await repository.CheckUserExistsByEmail(dto.Email))
             {
-                var response = await base.AddAsync(dto);
+                var response = await base.AddWithReturnAsync(dto, include: query => query
+                                                                    .Include(u => u.Gender)
+                                                                    .Include(u => u.State)
+                                                                    .Include(u => u.City)
+                                                                    .Include(u => u.UserHobbies)
+                                                                       .ThenInclude(uh => uh.Hobby), keySelector: e => e.Id);
                 if (!response.IsSuccess) { 
                     imageHelper.DeleteImage(Constants.UserProfileImages, dto.PhotoPath);
                 }
                 return response;
             }
             else
-                return APIResponseDTO.Fail($"User already exists with email {dto.Email}!");
+                return APIResponseDTO<GetUserResponseDTO>.Fail($"User already exists with email {dto.Email}!");
         }
 
         public new async Task<APIResponseDTO<DataTableResponseDTO<GetUserResponseDTO>>> GetAllAsync(GetUserRequestListDTO dto)
@@ -81,14 +86,14 @@ namespace Application.UseCaseImplementation
             return response;
         }
 
-        public new async Task<APIResponseDTO> UpdateAsync(Guid id, UpdateUserRegistrationDTO dto)
+        public new async Task<APIResponseDTO<GetUserResponseDTO>> UpdateAsync(Guid id, UpdateUserRegistrationDTO dto)
         {
             using var transaction = await repository.BeginTransactionAsync();
             try
             {
                 var dbEntity = await repository.GetByIdAsync(id);
                 if (dbEntity == null)
-                    return APIResponseDTO.Fail("Record not found.");
+                    return APIResponseDTO<GetUserResponseDTO>.Fail("Record not found.");
 
                 dto.PhotoPath = dto.Photo != null
                         ? await imageHelper.UpdateImageAsync(dto.Photo, Constants.UserProfileImages, dbEntity.PhotoPath) :
@@ -104,7 +109,12 @@ namespace Application.UseCaseImplementation
 
                     await repository.UpdateHobbies(id, newHobbies);
                 }
-                var result =  await base.UpdateAsync(id, dto);
+                var result =  await base.UpdateWithReturnAsync(id, dto, include: query => query
+                                                                    .Include(u => u.Gender)
+                                                                    .Include(u => u.State)
+                                                                    .Include(u => u.City)
+                                                                    .Include(u => u.UserHobbies)
+                                                                       .ThenInclude(uh => uh.Hobby));
                 await repository.CommitTransactionAsync();
                 return result;
             }
@@ -115,14 +125,19 @@ namespace Application.UseCaseImplementation
             }
         }
 
-        public new async Task<APIResponseDTO> PatchAsync(Guid id, PatchUserRegistrationDTO dto)
+        public new async Task<APIResponseDTO<GetUserResponseDTO>> PatchAsync(Guid id, PatchUserRegistrationDTO dto)
         {
             using var transaction = await repository.BeginTransactionAsync();
             try
             {
-                var dbEntity = await repository.GetByIdAsync(id);
+                var dbEntity = await repository.GetByIdAsync(id, include: query => query
+                                                                    .Include(u => u.Gender)
+                                                                    .Include(u => u.State)
+                                                                    .Include(u => u.City)
+                                                                    .Include(u => u.UserHobbies)
+                                                                       .ThenInclude(uh => uh.Hobby));
                 if (dbEntity == null)
-                    return APIResponseDTO.Fail("Record not found.");
+                    return APIResponseDTO<GetUserResponseDTO>.Fail("Record not found.");
 
                 if (dto.Photo != null)
                 {
@@ -144,7 +159,7 @@ namespace Application.UseCaseImplementation
                     updatedFields.Remove("Hobbies");
                 }
 
-                var result = await base.PatchAsync(id, updatedFields);
+                var result = await base.PatchWithReturnAsync(id, updatedFields);
                 await repository.CommitTransactionAsync();
                 return result;
             }

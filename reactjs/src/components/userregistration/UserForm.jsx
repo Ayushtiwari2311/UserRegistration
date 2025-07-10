@@ -99,7 +99,7 @@ const UserForm = ({ onSubmit, userId = null, onClose }) => {
     };
 
     return (
-        <form onSubmit={submit} className="space-y-5 max-w-2xl mx-auto overflow-y-auto max-h-[85vh]">
+        <form onSubmit={submit} className="space-y-5 max-w-2xl mx-auto">
             {/* Name */}
             <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900">Name</label>

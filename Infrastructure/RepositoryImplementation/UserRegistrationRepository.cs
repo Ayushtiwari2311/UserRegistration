@@ -15,18 +15,21 @@ namespace Infrastructure.RepositoryImplementation
         public async Task<bool> CheckUserExistsByEmail(string email)
             => await _context.TrnUserRegistrations.AnyAsync(u => u.Email == email);
 
-        public async Task UpdateHobbies(Guid userId,ICollection<TrnUserHobby> userHobbies) {
+        public async Task UpdateHobbies(Guid userId, ICollection<TrnUserHobby> userHobbies)
+        {
+            var existingHobbies = await _context.MUserHobbies
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            _context.MUserHobbies.RemoveRange(existingHobbies);
+
             if (userHobbies is { Count: > 0 })
             {
-                var existingHobbies = await _context.MUserHobbies.AsNoTracking()
-                    .Where(x => x.UserId == userId)
-                    .ToListAsync();
-
-                _context.MUserHobbies.RemoveRange(existingHobbies);
-
                 await _context.MUserHobbies.AddRangeAsync(userHobbies);
-                await _context.SaveChangesAsync();
             }
-        } 
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
+

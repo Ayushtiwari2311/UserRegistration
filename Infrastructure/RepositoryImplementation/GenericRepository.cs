@@ -59,7 +59,7 @@ namespace Infrastructure.RepositoryImplementation
            IQueryable<T> query = _context.Set<T>();
            if (include != null)
               query = include(query); // supports ThenInclude
-           return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
+           return await query.AsNoTracking().FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
         }
 
         public virtual async Task AddAsync(T entity)

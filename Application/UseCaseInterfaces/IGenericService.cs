@@ -18,11 +18,16 @@ namespace Application.UseCaseInterfaces
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
-        Task<APIResponseDTO> AddAsync(TSaveDto dto);
-        Task<APIResponseDTO> UpdateAsync(object id,TUpdateDto entity);
-        Task<APIResponseDTO> PatchAsync(object id, Dictionary<string, object> updatedFields);
-        Task<APIResponseDTO> DeleteAsync(object id);
         Task<APIResponseDTO<TGetDto>> GetByIdAsync(object id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
+        Task<APIResponseDTO> AddAsync(TSaveDto dto);
+        Task<APIResponseDTO<TGetDto>> AddWithReturnAsync(TSaveDto dto,
+                    Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null,
+                    Func<TEntity, object> keySelector = null!);
+        Task<APIResponseDTO> UpdateAsync(object id,TUpdateDto entity);
+        Task<APIResponseDTO<TGetDto>> UpdateWithReturnAsync(object id, TUpdateDto dto, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
+        Task<APIResponseDTO> PatchAsync(object id, Dictionary<string, object> updatedFields);
+        Task<APIResponseDTO<TGetDto>> PatchWithReturnAsync(object id, Dictionary<string, object> updatedFields, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
+        Task<APIResponseDTO> DeleteAsync(object id);
         Task<APIResponseDTO> SaveChangesAsync();
     }
 }
